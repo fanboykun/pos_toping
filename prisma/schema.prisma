@@ -1,0 +1,73 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id                  String  @id   @default(uuid())
+  name                String  
+  price               Int   
+  categoryId          String?
+  category            Category?  @relation(fields: [categoryId], references: [id])
+  productTransaction  ProductTransaction[]
+}
+
+model Category {
+  id                  String  @id   @default(uuid())
+  name                String  
+  products            Product[]
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model Toping {
+  id                  String  @id   @default(uuid())
+  name                String  
+  price               Int
+  productTopingTransaction ProductTopingTransaction[]
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model Transaction {
+  id                  String  @id   @default(uuid())
+  total_price         Int     
+  productTransaction  ProductTransaction[]
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model ProductTransaction {
+  id                          String  @id   @default(uuid())
+  transactionId               String  
+  transaction                 Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  productId                   String  
+  product                     Product @relation(fields: [productId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  quantity                    Int @default(1)
+  total                       Int
+  productTopingTransaction    ProductTopingTransaction[]
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model ProductTopingTransaction {
+  id                          String  @id   @default(uuid())
+  productTransactionId        String  
+  productTransaction          ProductTransaction @relation(fields: [productTransactionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  topingId                    String
+  toping                      Toping @relation(fields: [topingId], references: [id], onUpdate: Cascade)
+  quantity                    Int @default(1)
+  total                       Int 
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
