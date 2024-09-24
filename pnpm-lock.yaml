@@ -23,6 +23,9 @@ dependencies:
   tailwind-variants:
     specifier: ^0.2.1
     version: 0.2.1(tailwindcss@3.4.9)
+  ts-input-validator:
+    specifier: ^1.0.3
+    version: 1.0.3
   uuid:
     specifier: ^10.0.0
     version: 10.0.0
@@ -2849,6 +2852,10 @@ packages:
     dependencies:
       typescript: 5.6.2
     dev: true
+
+  /ts-input-validator@1.0.3:
+    resolution: {integrity: sha512-eTegXBxNWP5kB1hlzPzxsS/cjs6K9s4205SL194R2aeVPjYWXDakCQrjVap3EJzvnQQMyarFT62UYs8FnYnTLA==}
+    dev: false
 
   /ts-interface-checker@0.1.13:
     resolution: {integrity: sha512-Y/arvbn+rrz3JCKl9C4kVNfTfSm2/mEp5FSz5EsZSANGPSlQrpRI5M4PKF+mJnE52jOO90PnPSc3Ur3bTQw0gA==}
