@@ -3,9 +3,6 @@
   import * as Dialog from "$lib/components/ui/dialog";
   import { Input } from "$lib/components/ui/input";
   import { Label } from "$lib/components/ui/label";
-  import * as Select from "$lib/components/ui/select/index";
-	import type { Category } from "@prisma/client";
-	import { capitalizeFirstLetterOfEachWord } from '$lib';
 	import { applyAction, enhance } from "$app/forms";
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import type { ActionData } from "../$types";
@@ -13,9 +10,7 @@
 
   export let form: ActionData
   export let isOpen: boolean = false
-  export let categories: Category[]
   export let onClose: Function
-  let selectedcatId: string = ''
 
   const closeModal = () => {
     isOpen = !isOpen
@@ -25,7 +20,7 @@
 
   let creating = false
 
-  const handleAddProduct: SubmitFunction = ( { formData } ) => {
+  const handleAddTopping: SubmitFunction = ( { formData } ) => {
           creating = true
           return async ( { result, update } ) => {
               await update()
@@ -43,16 +38,16 @@
 <Dialog.Root open={isOpen} onOpenChange={closeModal}>
     <Dialog.Content class="sm:max-w-[425px]">
       <Dialog.Header>
-        <Dialog.Title>Tambah Product</Dialog.Title>
+        <Dialog.Title>Tambah Topping</Dialog.Title>
         <Dialog.Description>
-          Tambah produk baru
+          Tambah Topping Baru
         </Dialog.Description>
       </Dialog.Header>
-      <form method="post" action="?/addProduct" use:enhance={handleAddProduct} id="addProduct">
+      <form method="post" action="?/addTopping" use:enhance={handleAddTopping} id="addProduct">
         <div class="grid w-full items-center gap-4">
           <div class="flex flex-col space-y-1.5">
             <Label for="name">Nama</Label>
-            <Input id="name" name="name" placeholder="Nama Produk" />
+            <Input id="name" name="name" placeholder="Nama Topping" />
             {#if form?.result?.name?.valid == false}
               <InputError error={form?.result?.name?.message} />
             {/if}
@@ -62,25 +57,6 @@
             <Input id="price" name="price" placeholder="Harga Produk" type="number" />
             {#if form?.result?.price?.valid == false}
               <InputError error={form?.result?.price?.message} />
-            {/if}
-          </div>
-          <div class="flex flex-col space-y-1.5">
-            <Label for="categoryId">Kategori</Label>
-            <Select.Root name="categoryId">
-              <Select.Input name="categoryId" bind:value={selectedcatId} />
-              <Select.Trigger id="categoryId" name="categoryId" value={form?.categoryId ?? ''}>
-                <Select.Value placeholder="Select" />
-              </Select.Trigger>
-              <Select.Content>
-                {#each categories as category}
-                  <Select.Item value={category.id} label={capitalizeFirstLetterOfEachWord(category.name)}>
-                    {capitalizeFirstLetterOfEachWord(category.name)}
-                  </Select.Item>
-                {/each}
-              </Select.Content>
-            </Select.Root>
-            {#if form?.result?.categoryId?.valid == false}
-              <InputError error={form?.result?.categoryId?.message} />
             {/if}
           </div>
         </div>

@@ -5,7 +5,7 @@
 	import type { ActionData } from "../$types";
 	import { applyAction, enhance } from "$app/forms";
 
-    export let productId: string|undefined
+    export let toppingId: string|undefined
     export let isOpen = false
     export let form: ActionData
     export let onClose: Function
@@ -18,9 +18,9 @@
         return onClose()
     }
 
-    const handleDeleteProduct:  SubmitFunction = ( { formData, cancel } ) => {
-        if(!productId) return cancel()
-        formData.append('productId', productId)
+    const handleDeleteTopping:  SubmitFunction = ( { formData, cancel } ) => {
+        if(!toppingId) return cancel()
+        formData.append('toppingId', toppingId)
         deleting = true
         return async ( { result, update } ) => {
             await update()
@@ -43,7 +43,7 @@
             Data yang telah di hapus akan terhapus secara permanen
         </Dialog.Description>
         </Dialog.Header>
-        <form action="?/deleteProduct" method="post" use:enhance={handleDeleteProduct}>
+        <form action="?/deleteTopping" method="post" use:enhance={handleDeleteTopping}>
             <Dialog.Footer class="flex gap-2 items-center justify-between">
                 <Button variant="outline" type="button" on:click={closeModal}>Cancel</Button>
                 <Button variant="destructive" type="submit" disabled={deleting}>

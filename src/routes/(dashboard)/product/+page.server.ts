@@ -1,21 +1,23 @@
-import { addNewProduct, deleteProduct as deletePRoductFormDb, updateProduct } from "$lib/server/product"
-import { PrismaClient } from "@prisma/client"
+import { getAllCategory } from "$lib/server/category"
+import { addNewProduct, deleteProduct as deletePRoductFormDb, getAllProductWithCategory, updateProduct } from "$lib/server/product"
 import { fail, type Action, type Actions } from "@sveltejs/kit"
 import { Validator } from "ts-input-validator"
 import type { validateType, finalValidationResult } from "ts-input-validator"
 
 // type ActionReturn = Record<string, unknown> & { message: string, success: boolean }
 
-const prisma = new PrismaClient()
 export const load = async () => {
-    const products = await prisma.product.findMany({
-        include: { category: true },
-        orderBy: {createdAt: 'desc'}
-    })
+    // const getProducts = prisma.product.findMany({
+    //     include: { category: true },
+    //     orderBy: {createdAt: 'desc'}
+    // })
 
-    const categories = await prisma.category.findMany({
-        orderBy: {createdAt: 'desc'}
-    })
+    // const getCategories = prisma.category.findMany({
+    //     orderBy: {createdAt: 'desc'}
+    // })
+
+    // const [products, categories] = await Promise.all([getAllProductWithCategory(), getAllCategory()])
+    const [products, categories] = [getAllProductWithCategory(), getAllCategory()]
     return { products, categories }
 }
 
@@ -82,7 +84,7 @@ const addProduct: Action = async ({ request }) => {
     if(!product) return fail(400, { message: 'Failed to create product', data: { ...data }, success: false })
 
     // return the result
-    return { product, message: 'Product updated successfully', success: true }
+    return { product, message: 'Product created successfully', success: true }
 }
 
 const deleteProduct: Action = async ({ request }) => {
