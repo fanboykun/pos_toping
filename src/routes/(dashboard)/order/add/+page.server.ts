@@ -1,7 +1,7 @@
-import { saveTransaction } from '$lib/server/transaction'
+import { findTransactionWithProductAndToping, saveTransaction, updateTransaction } from '$lib/server/transaction'
 import type { MakeTransaction } from '$lib/transaction'
 import { PrismaClient } from '@prisma/client'
-import type { Action, Actions } from '@sveltejs/kit'
+import { fail, type Action, type Actions } from '@sveltejs/kit'
 const prisma = new PrismaClient()
 
 export const load = async () => {
@@ -20,14 +20,14 @@ const addTransaction: Action = async (event) => {
         data = JSON.parse(String(stringData)) ?? undefined as MakeTransaction|undefined
     } catch(err) {
         console.log(err)
-        return { message: 'error' }
+        return { message: 'error', success: false }
     }
-    if(!data) return { message: 'error' }
+    if(!data) return { message: 'error', success: false }
 
     try {
         const validatedMakeTransactionData = await validateAndRecalculateTransaction(data)
         const transaction = await saveTransaction(validatedMakeTransactionData)
-        return { transaction, message: 'success' }
+        return { transaction, message: 'success', success: true }
     } catch(err) {
         console.log(err)
         return { message: 'error' }
@@ -119,5 +119,34 @@ const validateAndRecalculateTransaction = async (transactionData: MakeTransactio
     return cleanedTransactionData;
 }
 
+const editTransaction: Action = async ( { request } ) => {
+    const form = await request.formData()
+    const stringData = form.get('data')
+    const transactionId = String(form.get('transactionId'))
+    let data: MakeTransaction|undefined
 
-export const actions: Actions = { addTransaction }
+    try {
+        data = JSON.parse(String(stringData)) ?? undefined as MakeTransaction|undefined
+    } catch(err) {
+        console.log(err)
+        return fail(401, { message: 'Form is invalied', success: false })
+    }
+    if(!data || !transactionId) return fail(401, { message: 'Form is invalid', success: false })
+
+    // Step 1: Validate and recalculate product and topping prices from the database
+    const validatedData = await validateAndRecalculateTransaction(data);
+
+    // Step 2: Fetch the existing transaction with all product and topping relations
+    const existingTransaction = await findTransactionWithProductAndToping(transactionId)
+    if(!existingTransaction) return fail(401, { message: 'Transaction could not been found!', success: false })
+
+    const transaction = await updateTransaction(transactionId, validatedData);
+    if(!transaction) return fail(401, { message: 'error', success: false })
+    return {
+        message: 'Transaction updated successfully',
+        success: true,
+    }
+
+}
+
+export const actions: Actions = { addTransaction, editTransaction }

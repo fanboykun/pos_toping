@@ -58,8 +58,8 @@ model ProductTransaction {
   quantity                    Int @default(1)
   total                       Int
   productTopingTransaction    ProductTopingTransaction[]
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  createdAt                   DateTime @default(now())
+  updatedAt                   DateTime @updatedAt
 }
 
 model ProductTopingTransaction {

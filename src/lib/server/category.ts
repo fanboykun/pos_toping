@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client"
+import { Prisma, PrismaClient } from "@prisma/client"
 
 
 const prisma = new PrismaClient()
@@ -14,3 +14,47 @@ export const getAllCategory = async () => {
         return null
     }
 }
+
+export const addNewCategory = async (data: Prisma.CategoryCreateInput) => {
+    try {
+        const category = await prisma.category.create({
+            data: {
+                name: data.name
+            }
+        })
+        return category
+    } catch(err) {
+        console.log(err)
+        return null
+    }
+}
+
+export const updateCategory = async (data: Required<Pick<Prisma.TopingCreateInput, 'id'>> & Omit<Prisma.TopingCreateInput, 'id'>) => {
+    try {
+        const category = await prisma.category.update({
+            data: {
+                name: data.name
+            },
+            where: {
+                id: data.id
+            }
+        })
+        return category
+    } catch(err) {
+        console.log(err)
+        return null
+    }
+}
+
+export const deleteCategory = async (toppingId: string) => {
+    try {
+        await prisma.category.delete({
+            where: { id: toppingId }
+        })
+        return true
+    } catch(err) {
+        console.log(err)
+        return false
+    }
+}
+
