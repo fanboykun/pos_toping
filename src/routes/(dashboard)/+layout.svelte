@@ -21,19 +21,23 @@
     {
       path: '/category',
       label: 'Category',
-    },
-    {
-      path: '/user',
-      label: 'User',
     }
   ]
+  export let data
+
+  if(data.user?.isAdmin) {
+    menus.push({
+      path: '/user',
+      label: 'User',
+    })
+  }
 
 </script>
 <svelte:head>
     <title>Dashboard</title>
 </svelte:head>
 
-<Navbar {menus} />
+<Navbar {menus} user={data.user} />
 
 <slot />
 

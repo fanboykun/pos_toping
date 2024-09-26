@@ -54,7 +54,7 @@
           </div>
           <div class="flex flex-col space-y-1.5">
             <Label for="price">Harga</Label>
-            <Input id="price" name="price" placeholder="Harga Produk" type="number" />
+            <Input id="price" name="price" placeholder="Harga Topping" type="number" />
             {#if form?.result?.price?.valid == false}
               <InputError error={form?.result?.price?.message} />
             {/if}

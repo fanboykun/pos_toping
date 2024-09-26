@@ -18,7 +18,7 @@
 
 
 <!-- Table Section -->
-<div class="max-w-[85rem] px-4 sm:px-6 lg:px-8 py-4 mx-auto">
+<div class="max-w-[85rem] px-4 pt-4 sm:px-6 lg:px-8 xl:pb-4 pb-[100px] mx-auto">
     <!-- Card -->
     <div class="flex flex-col">
       <div class="-m-1.5 overflow-x-auto">
@@ -31,7 +31,11 @@
                     Order List
                 </h2>
                 <p class="text-sm text-gray-600 dark:text-neutral-400">
-                    Keys you have generated to connect with third-party clients or access the <a class="inline-flex items-center gap-x-1.5 text-blue-600 decoration-2 hover:underline focus:outline-none focus:underline font-medium dark:text-blue-500" href="#">Preline API.</a>
+                  Semua
+                  <span class="inline-flex items-center gap-x-1.5 text-blue-600 decoration-2 hover:underline focus:outline-none focus:underline font-medium" >
+                    Transaksi
+                  </span>
+                  yang telah dibuat ditampilkan dibawah 
                 </p>
               </div>
   

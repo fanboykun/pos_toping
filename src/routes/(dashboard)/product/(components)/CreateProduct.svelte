@@ -45,7 +45,7 @@
       <Dialog.Header>
         <Dialog.Title>Tambah Product</Dialog.Title>
         <Dialog.Description>
-          Tambah produk baru
+          Tambah Produk Baru
         </Dialog.Description>
       </Dialog.Header>
       <form method="post" action="?/addProduct" use:enhance={handleAddProduct} id="addProduct">

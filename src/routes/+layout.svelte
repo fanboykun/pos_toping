@@ -5,4 +5,4 @@
 <svelte:head>
 	<title>Angkringan</title>
 </svelte:head>
-<slot></slot>
+<slot />

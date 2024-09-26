@@ -1,27 +1,24 @@
+import { findIsRequestFromAdmin } from "$lib/server/auth.js"
 import { getAllCategory } from "$lib/server/category"
 import { addNewProduct, deleteProduct as deletePRoductFormDb, getAllProductWithCategory, updateProduct } from "$lib/server/product"
-import { fail, type Action, type Actions } from "@sveltejs/kit"
+import { fail, redirect, type Action, type Actions } from "@sveltejs/kit"
 import { Validator } from "ts-input-validator"
 import type { validateType, finalValidationResult } from "ts-input-validator"
 
 // type ActionReturn = Record<string, unknown> & { message: string, success: boolean }
 
-export const load = async () => {
-    // const getProducts = prisma.product.findMany({
-    //     include: { category: true },
-    //     orderBy: {createdAt: 'desc'}
-    // })
+export const load = async ( { locals } ) => {
+    if ( !locals.session || locals.user === null  ) {
+        return redirect(302, '/login');
+    }
 
-    // const getCategories = prisma.category.findMany({
-    //     orderBy: {createdAt: 'desc'}
-    // })
-
-    // const [products, categories] = await Promise.all([getAllProductWithCategory(), getAllCategory()])
     const [products, categories] = [getAllProductWithCategory(), getAllCategory()]
     return { products, categories }
 }
 
-const addProduct: Action = async ({ request }) => {
+const addProduct: Action = async ({ request, locals }) => {
+    if(!findIsRequestFromAdmin(locals)) return fail(302, { message: 'User is unauthorized', success: false })
+
     const form = await request.formData()
 
     // get the data from the form
@@ -87,7 +84,9 @@ const addProduct: Action = async ({ request }) => {
     return { product, message: 'Product created successfully', success: true }
 }
 
-const deleteProduct: Action = async ({ request }) => {
+const deleteProduct: Action = async ({ request, locals }) => {
+    if(!findIsRequestFromAdmin(locals)) return fail(302, { message: 'User is unauthorized', success: false })
+
     const form = await request.formData()
     const pId = form.get('productId')
     if(!pId || pId == 'undefined') fail(401, { message: 'Product does not provided', data: { pId }, success: false }) 
@@ -96,7 +95,9 @@ const deleteProduct: Action = async ({ request }) => {
     return { message: 'Product deleted successfully', success: true }
 }
 
-const editProduct: Action = async ({ request }) => {
+const editProduct: Action = async ({ request, locals }) => {
+    if(!findIsRequestFromAdmin(locals)) return fail(302, { message: 'User is unauthorized', success: false })
+
     const form = await request.formData()
 
     // get the data from the form

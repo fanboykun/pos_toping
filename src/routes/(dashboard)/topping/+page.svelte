@@ -39,7 +39,7 @@ const onActionModalCLose = (modal: 'add'|'delete'|'edit') => {
   <LoadingState />
 {:then toppings} 
   <!-- Table Section -->
-  <div class="max-w-[85rem] px-4 py-4 sm:px-6 lg:px-8 mx-auto">
+  <div class="max-w-[85rem] px-4 pt-4 sm:px-6 lg:px-8 xl:pb-4 pb-[100px] mx-auto">
       <!-- Card -->
       <div class="flex flex-col">
         <div class="-m-1.5 overflow-x-auto">
@@ -52,17 +52,22 @@ const onActionModalCLose = (modal: 'add'|'delete'|'edit') => {
                     Topping List
                   </h2>
                   <p class="text-sm text-gray-600 dark:text-neutral-400">
-                  Semua topping yang telah dibuat ditampilkan dibawah
+                    Semua
+                    <span class="inline-flex items-center gap-x-1.5 text-blue-600 decoration-2 hover:underline focus:outline-none focus:underline font-medium" >
+                      Topping
+                    </span>
+                    yang telah dibuat ditampilkan dibawah 
                   </p>
                 </div>
     
                 <div>
                   <div class="inline-flex gap-x-2">
-    
+                    {#if data.user?.isAdmin}
                     <button type="button" on:click={() => isAddToppingModalOpen = true} class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
                       <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
                       Create
                     </button>
+                    {/if}
                   </div>
                 </div>
               </div>
@@ -96,8 +101,9 @@ const onActionModalCLose = (modal: 'add'|'delete'|'edit') => {
                       </span>
                       </div>
                     </th>
-
+                    {#if data.user?.isAdmin}
                     <th scope="col" class="px-6 py-3 text-end"></th>
+                    {/if}
                   </tr>
                 </thead>
     
@@ -124,6 +130,7 @@ const onActionModalCLose = (modal: 'add'|'delete'|'edit') => {
                             <span class="text-xs text-gray-600 dark:text-neutral-400">{formatTime(topping.createdAt)}</span>
                           </div>
                         </td>
+                        {#if data.user?.isAdmin}
                         <td class="size-px whitespace-nowrap">
                           <div class="flex gap-2">
                             <Button class="py-2 px-3 " type="button" variant="destructive" on:click={() => { isDeleteToppingModalOpen = true; selectedTopping = topping }}>
@@ -138,6 +145,7 @@ const onActionModalCLose = (modal: 'add'|'delete'|'edit') => {
                             </Button>
                           </div>
                         </td>
+                        {/if}
                       </tr>
                       {/each}
                   {:else}
@@ -154,12 +162,12 @@ const onActionModalCLose = (modal: 'add'|'delete'|'edit') => {
       <!-- End Card -->
   </div>  
   <!-- End Table Section -->
+  <!-- Modal Seciton -->
+  <DeleteTopping isOpen={isDeleteToppingModalOpen} toppingId={selectedTopping?.id} {form} onClose={() => onActionModalCLose('delete')} />
+  <CreateTopping {form} isOpen={isAddToppingModalOpen} onClose={() => onActionModalCLose('add')} />
+  <EditTopping topping={selectedTopping} {form} isOpen={isEditToppingModalOpen} onClose={() => onActionModalCLose('edit')} />
+<!-- End Modal Seciton -->
+  
  {:catch}
  <ErrorState />
 {/await}
-
-
-<DeleteTopping isOpen={isDeleteToppingModalOpen} toppingId={selectedTopping?.id} {form} onClose={() => onActionModalCLose('delete')} />
-<CreateTopping {form} isOpen={isAddToppingModalOpen} onClose={() => onActionModalCLose('add')} />
-<EditTopping topping={selectedTopping} {form} isOpen={isEditToppingModalOpen} onClose={() => onActionModalCLose('edit')} />
-

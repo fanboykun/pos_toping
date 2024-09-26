@@ -33,7 +33,7 @@
 
   let editing = false
 
-  const handleAddProduct: SubmitFunction = ( { formData, cancel } ) => {
+  const handleEditProduct: SubmitFunction = ( { formData, cancel } ) => {
       if(!product) return cancel()
       editing = true
       formData.append('id', product.id)
@@ -56,10 +56,10 @@
       <Dialog.Header>
         <Dialog.Title>Update Product</Dialog.Title>
         <Dialog.Description>
-          Edit data topping
+          Edit Data Topping
         </Dialog.Description>
       </Dialog.Header>
-      <form method="post" action="?/editProduct" use:enhance={handleAddProduct} id="addProduct">
+      <form method="post" action="?/editProduct" use:enhance={handleEditProduct} id="addProduct">
         <div class="grid w-full items-center gap-4">
           <div class="flex flex-col space-y-1.5">
             {#if form?.result?.id?.valid == false}
@@ -103,7 +103,7 @@
         <Dialog.Footer class="flex justify-between mt-4">
           <Button variant="outline" on:click={closeModal}>Cancel</Button>
           <Button type="submit" disabled={editing} class="flex gap-1">
-            <span>Create</span>
+            <span>Update</span>
             {#if editing}
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4 animate-spin">
               <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />

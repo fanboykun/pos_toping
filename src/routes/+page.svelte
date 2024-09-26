@@ -23,17 +23,25 @@
         {
             path: '/',
             label: 'Home'
-        },
-        {
-            path: '/dashboard',
-            label: 'Dashboard'
         }
     ]
+
+    $: if(data.user) {
+        menus.push({
+            path: '/dashboard',
+            label: 'Dashboard'
+        })
+    }else {
+        menus.push({
+            path: '/login',
+            label: 'Login'
+        })
+    }
 </script>
 
 <div class="p-4 flex flex-col gap-2 min-h-[100svh] w-full h-full bg-neutral-50">
 
-    <Navbar {menus} />
+    <Navbar {menus} user={data.user} />
 
     <div class="w-full flex items-center justify-center">
         <div class="flex">
@@ -56,7 +64,7 @@
           </div>
     </div>
 
-    <div class="w-full h-full flex items-start justify-center">
+    <div class="w-full h-full flex items-start justify-center pb-20 xl:pb-0">
         {#if data.products && data.topings}
             {#if showItemState == 'menu'}
             <div in:fly={{ x: 150, duration:500 }} on:introstart={() => hideShowScrollBar()} on:introend={() => hideShowScrollBar('out')} class="grid grid-cols-1 w-full sm:grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">

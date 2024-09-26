@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client'
 import { faker } from '@faker-js/faker';
 import { v4 as uuid } from 'uuid'
 import type { MakeTransaction, MakeTransactionProduct, MakeTransactionToping } from '../src/lib/transaction'
+import { Argon2id } from 'oslo/password';
 const prisma = new PrismaClient()
 
 type DummyCategory = {
@@ -23,6 +24,9 @@ type DummyToping = {
 }
 
 async function main() {
+
+    await insertUser()
+
     await prisma.category.deleteMany()
     const dummyCategories = createDummyCategory()
     const categories = await prisma.category.createMany({
@@ -157,6 +161,26 @@ const createDummyTransaction = (products: DummyProduct[], topings: DummyToping[]
 function getRandomItem<T>(array: T[]): T {
     const randomIndex = Math.floor(Math.random() * array.length);
     return array[randomIndex];
+}
+
+const insertUser = async () => {
+    // equal to password   (the password is password) 
+    const hashed_password = await new Argon2id().hash('password')
+    const email = 'admin@gmail.com'
+
+    const user = await prisma.user.upsert({
+    where: { email: email },
+    update: {
+        password: hashed_password,
+    },
+    create: {
+        name: 'Admin',
+        email: email,
+        isAdmin: true,
+        password: hashed_password,
+    },
+    });
+    return user
 }
 
 main()

@@ -29,7 +29,7 @@ export const addNewCategory = async (data: Prisma.CategoryCreateInput) => {
     }
 }
 
-export const updateCategory = async (data: Required<Pick<Prisma.TopingCreateInput, 'id'>> & Omit<Prisma.TopingCreateInput, 'id'>) => {
+export const updateCategory = async (data: Required<Pick<Prisma.CategoryCreateInput, 'id'>> & Omit<Prisma.CategoryCreateInput, 'id'>) => {
     try {
         const category = await prisma.category.update({
             data: {

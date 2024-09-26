@@ -1,16 +1,21 @@
 import { findTransactionWithProductAndToping, saveTransaction, updateTransaction } from '$lib/server/transaction'
 import type { MakeTransaction } from '$lib/transaction'
 import { PrismaClient } from '@prisma/client'
-import { fail, type Action, type Actions } from '@sveltejs/kit'
+import { fail, redirect, type Action, type Actions } from '@sveltejs/kit'
 const prisma = new PrismaClient()
 
-export const load = async () => {
+export const load = async ( { locals } ) => {
+    if ( !locals.session || locals.user === null  ) {
+        return redirect(302, '/login');
+    }
+
     const products = await prisma.product.findMany({
         include: { category: true }
     })
     const topings = await prisma.toping.findMany()
     return { products, topings }
 }
+
 const addTransaction: Action = async (event) => {
     const form = await event.request.formData()
     const stringData = form.get('data')

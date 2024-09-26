@@ -1,13 +1,20 @@
+import { findIsRequestFromAdmin } from "$lib/server/auth.js";
 import * as ToppingFunction from "$lib/server/topping"
-import { fail, type Action, type Actions } from "@sveltejs/kit"
+import { fail, redirect, type Action, type Actions } from "@sveltejs/kit"
 import { Validator, type finalValidationResult, type validateType } from "ts-input-validator"
 
-export const load = async () => {
+export const load = async ( { locals } ) => {
+    if ( !locals.session || locals.user === null  ) {
+        return redirect(302, '/login');
+    }
+
     const toppings = ToppingFunction.getAllTopping()
     return { toppings }
 }
 
-const addTopping: Action = async ({ request }) => {
+const addTopping: Action = async ({ request, locals }) => {
+    if(!findIsRequestFromAdmin(locals)) return fail(302, { message: 'User is unauthorized', success: false })
+
     const form = await request.formData()
 
     // get the data from the form
@@ -52,7 +59,9 @@ const addTopping: Action = async ({ request }) => {
 
 }
 
-const deleteTopping: Action = async ( { request } ) => {
+const deleteTopping: Action = async ( { request, locals } ) => {
+    if(!findIsRequestFromAdmin(locals)) return fail(302, { message: 'User is unauthorized', success: false })
+
     const form = await request.formData()
     const tId = form.get('toppingId')
     if(!tId || tId == 'undefined') fail(401, { message: 'Topping does not provided', data: { tId }, success: false }) 
@@ -61,7 +70,9 @@ const deleteTopping: Action = async ( { request } ) => {
     return { message: 'Topping deleted successfully', success: true }
 }
 
-const editTopping: Action = async ( { request } ) => {
+const editTopping: Action = async ( { request, locals } ) => {
+    if(!findIsRequestFromAdmin(locals)) return fail(302, { message: 'User is unauthorized', success: false })
+
     const form = await request.formData()
 
     // get the data from the form
