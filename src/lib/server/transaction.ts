@@ -11,6 +11,13 @@ export const getAllTransaction = async () => {
             createdAt: 'desc'
         },
         include: {
+            user: {
+                select: {
+                    id: true,
+                    name: true,
+                    email:true
+                }
+            },
             productTransaction: {
                 include: {
                     product: true,
@@ -30,6 +37,7 @@ export const saveTransaction = async (data: MakeTransaction) => {
     try {
         const transaction = await prisma.transaction.create({
             data: {
+                userId: data.userId,
                 total_price: data.total_price,
                 productTransaction: {
                     create: data.products.map(product => ({

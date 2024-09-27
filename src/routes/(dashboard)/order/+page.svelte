@@ -1,19 +1,45 @@
 <script lang="ts">
-	import { capitalizeFirstLetterOfEachWord, formatCurrency, formatDay, formatTime } from "$lib";
-	import { horizontalSlide, logicalPropertiesHorizontalSlide } from "$lib/client/transition.js";
+	import { capitalizeFirstLetterOfEachWord, createGradientAvatar, formatCurrency, formatDay, formatTime, getFistCharFromName } from "$lib";
+	import { logicalPropertiesHorizontalSlide } from "$lib/client/transition.js";
 	import type { TrasactionWithProductWithToping } from "$lib/server/transaction";
-	import { cubicInOut } from "svelte/easing";
-	import { fly, slide } from "svelte/transition";
+	import { fly } from "svelte/transition";
+  import * as Avatar from "$lib/components/ui/avatar";
+	import ProductOrderList from "./(components)/ProductOrderList.svelte";
+	import ToppingOrderList from "./(components)/ToppingOrderList.svelte";
+	import DeleteOrder from "./(components)/DeleteOrder.svelte";
 
-    export let data
-    const transactions: TrasactionWithProductWithToping = data.transactions
-    let openedItem: string|undefined
+  export let data
+  export let form
 
-    const showHideItem = (transactionId: string) => {
-        if(!openedItem) return openedItem = transactionId
-        if(openedItem == transactionId) return openedItem = undefined
-        openedItem = transactionId
-    }
+  const transactions: TrasactionWithProductWithToping = data.transactions
+  let openedItem: string|undefined
+
+  const showHideItem = (transactionId: string) => {
+      if(!openedItem) return openedItem = transactionId
+      if(openedItem == transactionId) return openedItem = undefined
+      openedItem = transactionId
+  }
+
+  let isDeleteTransactionModalOpen = false
+  let isAddTransactionModalOpen = false
+  let isEditTransactionModalOpen = false
+
+  let selectedTransactionId: string
+
+  const onActionModalCLose = (modal: 'add'|'delete'|'edit') => {
+  switch (modal) {
+    case 'add' :
+      isAddTransactionModalOpen = false;
+      break
+    case 'delete' :
+      isDeleteTransactionModalOpen = false;
+      break
+    case 'edit' :
+      isEditTransactionModalOpen = false;
+      break
+  }
+}
+
 </script>
 
 
@@ -119,9 +145,12 @@
                   <td class="size-px whitespace-nowrap">
                     <div class="px-6 py-3">
                       <div class="flex items-center gap-x-2">
-                        <img class="inline-block size-6 rounded-full" src="https://images.unsplash.com/photo-1531927557220-a9e23c1e4794?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=facearea&facepad=2&w=300&h=300&q=80" alt="Avatar">
+                        <Avatar.Root class="h-6 w-6 sm:h-8 sm:w-8">
+                          <Avatar.Image src={createGradientAvatar()} alt="user avatar" />
+                          <Avatar.Fallback>{getFistCharFromName(transaction.user?.name)}</Avatar.Fallback>
+                        </Avatar.Root>
                         <div class="grow">
-                          <span class="text-sm text-gray-600 dark:text-neutral-400">Christina Bersh</span>
+                          <span class="text-sm text-gray-600 dark:text-neutral-400">{transaction?.user?.name ?? 'Unknown'}</span>
                         </div>
                       </div>
                     </div>
@@ -150,19 +179,45 @@
                     </div>
                   </td>
                   <td class="size-px whitespace-nowrap">
-                    <div class="px-6 py-1.5">
-                      <div class="border border-indigo-500 rounded-lg inline-block">
-                        <button id="hs-table-dropdown-1" type="button" class="hs-dropdown-toggle py-1.5 px-2 inline-flex justify-center items-center gap-2 rounded-lg text-gray-700 align-middle disabled:opacity-50 disabled:pointer-events-none focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-blue-600 transition-all text-sm dark:text-neutral-400 dark:hover:text-white dark:focus:ring-offset-gray-800" aria-haspopup="menu" aria-expanded="false" aria-label="Dropdown">
-                          <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
-                        </button>
-                      </div>
+                    <div class="flex gap-x-2 px-2">
+                      <button type="button" on:click={() => { selectedTransactionId = transaction.id; isDeleteTransactionModalOpen = true }} class="p-2 inline-flex items-center gap-x-0 text-sm font-semibold rounded-lg border border-red-400 text-red-600 decoration-2 hover:text-red-100 hover:bg-red-600 focus:shadow-md disabled:opacity-50 disabled:pointer-events-none">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="shrink-0 size-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                          </svg>                      
+                      </button>
+                      <a href="order/{transaction.id}" class="p-2 inline-flex items-center gap-x-0 text-sm font-semibold rounded-lg border border-blue-400 text-blue-600 decoration-2 hover:text-blue-100 hover:bg-blue-600 focus:shadow-md disabled:opacity-50 disabled:pointer-events-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="shrink-0 size-4">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                        </svg>                      
+                      </a>
                     </div>
                   </td>
                 </tr>
                 {#if openedItem == transaction.id}
                     <tr in:fly={{ duration: 800 }}>
                         <td colspan="6">
-                            <div in:logicalPropertiesHorizontalSlide={{direction: 'inline', duration: 800}} class="grid whitespace-nowrap md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 p-2 gap-2 w-full min-h-[200px] bg-gray-200">
+                          <div in:logicalPropertiesHorizontalSlide={{direction: 'inline', duration: 800}} class="grid whitespace-nowrap md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 p-2 gap-2 w-full min-h-[200px] bg-gray-200">
+                            {#each transaction.productTransaction as productTransaction}
+                              <ProductOrderList>
+                                <span slot="name">{productTransaction.product.name}</span>
+                                <span slot="product_price">{formatCurrency(productTransaction.product.price)}</span>
+                                <span slot="product_quantity">@{productTransaction.quantity}</span>
+                                <span slot="product_total_price">{formatCurrency(productTransaction.product.price * productTransaction.quantity)}</span>
+                                <div slot="topping" class="flex flex-col gap-2">
+                                  {#each productTransaction.productTopingTransaction as productTopingTransaction}
+                                    <ToppingOrderList>
+                                      <span slot="topping_name">{capitalizeFirstLetterOfEachWord(productTopingTransaction.toping.name)}</span>
+                                      <span slot="topping_price">{formatCurrency(productTopingTransaction.toping.price)}</span>
+                                      <span slot="topping_quantity">{productTopingTransaction.quantity}</span>
+                                      <span slot="topping_total_price">{formatCurrency(productTopingTransaction.total)}</span>
+                                    </ToppingOrderList>
+                                  {/each}
+                                </div>
+                                <span slot="total_price">{formatCurrency(productTransaction.total)}</span>
+                              </ProductOrderList>
+                            {/each}
+                          </div> 
+                            <!-- <div in:logicalPropertiesHorizontalSlide={{direction: 'inline', duration: 800}} class="grid whitespace-nowrap md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 p-2 gap-2 w-full min-h-[200px] bg-gray-200">
                                 {#each transaction.productTransaction as productTransaction}
                                 <div class="flex flex-col gap-2 bg-neutral-50 border p-2 rounded-md">
                                     <p class="flex justify-start items-center gap-1"> <span>{productTransaction.quantity}</span> <span class="font-semibold"> {productTransaction.product.name} </span> <span class="text-xs">({formatCurrency(productTransaction.product.price)})</span>  </p>
@@ -176,7 +231,7 @@
                                     <p class="text-sm">Total: <span class="font-medium">{formatCurrency(productTransaction.total)}</span></p>
                                 </div>
                                 {/each}
-                            </div>
+                            </div> -->
                         </td>
                     </tr>
                 {/if}
@@ -214,5 +269,9 @@
       </div>
     </div>
     <!-- End Card -->
-  </div>
+</div>
   <!-- End Table Section -->
+
+<DeleteOrder isOpen={isDeleteTransactionModalOpen} transactionId={selectedTransactionId} {form} onClose={() => onActionModalCLose('delete')} />
+
+

@@ -19,12 +19,12 @@ export type MakeTransactionProduct = {
     topings: MakeTransactionToping[]
 }
 export type MakeTransaction = {
-    cashier_id: string,
+    userId?: string,
     products: MakeTransactionProduct[],
     total_price: number
 }
 export const makeTransaction: Writable<MakeTransaction> = writable({
-    cashier_id: '',
+    userId: undefined,
     total_price: 0,
     products: []
 })

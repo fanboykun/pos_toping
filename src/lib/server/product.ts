@@ -4,6 +4,7 @@ import { Prisma } from '@prisma/client'
 const prisma = new PrismaClient()
 export type AllProductWithCategory = Prisma.PromiseReturnType<typeof getAllProductWithCategory>
 export type ProductWithCategory = Prisma.PromiseReturnType<typeof getProductWithCategory>
+export type ProductsGroupedByCategory = Prisma.PromiseReturnType<typeof getProductsGroupedByCategory>
 
 
 export const getAllProductWithCategory = async () => {
@@ -16,6 +17,28 @@ export const getAllProductWithCategory = async () => {
     } catch(err) {
         console.log(err)
         return null
+    }
+}
+
+export const getProductsGroupedByCategory = async () => {
+    try {
+        const categoriesWithProducts = await prisma.category.findMany({
+            include: {
+              products: true, // Include all related products in the result
+            },
+          });
+        
+          // Group products by category
+          const groupedProducts = categoriesWithProducts.map(category => ({
+            categoryId: category.id,
+            categoryName: category.name,
+            products: category.products, // The array of products within this category
+          }));
+        
+          return groupedProducts;
+    } catch(err) {
+        console.log(err)
+        return []
     }
 }
 

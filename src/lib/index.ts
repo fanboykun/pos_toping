@@ -1,3 +1,5 @@
+import { createCanvas } from "canvas";
+
 // place files you want to import through the `$lib` alias in this folder.
 export const capitalizeFirstLetter = (string: string) => {
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
@@ -36,18 +38,16 @@ export const generateSecureRandomId = () => {
     return 'id-' + crypto.getRandomValues(new Uint32Array(1))[0].toString(36);
 }
 
-export const createGradientAvatar = (document: Document) => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const createGradientAvatar = (document: Document|undefined = undefined) => {
     const getRandomColor = () => {
         const colors = ["red", "blue", "green", "yellow", "orange", "purple", "pink", "cyan", "magenta"];
         return colors[Math.floor(Math.random() * colors.length)];
     };
 
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    canvas.width = 100;
-    canvas.height = 100;
+    // Create a canvas with node-canvas
+    const canvas = createCanvas(100, 100);
+    const ctx = canvas.getContext('2d');
 
     const gradient = ctx.createLinearGradient(0, 0, 100, 100);
     gradient.addColorStop(1, getRandomColor());
@@ -56,7 +56,10 @@ export const createGradientAvatar = (document: Document) => {
 
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, 100, 100);
+
+    // Convert the canvas to a base64-encoded data URL
     return canvas.toDataURL();
+    
 }
 
 export const getFistCharFromName = (name: string|undefined) => {

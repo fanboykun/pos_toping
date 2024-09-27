@@ -1,3 +1,5 @@
+import { getProductsGroupedByCategory } from '$lib/server/product.js'
+import { getAllTopping } from '$lib/server/topping.js'
 import { findTransactionWithProductAndToping, saveTransaction, updateTransaction } from '$lib/server/transaction'
 import type { MakeTransaction } from '$lib/transaction'
 import { PrismaClient } from '@prisma/client'
@@ -9,11 +11,12 @@ export const load = async ( { locals } ) => {
         return redirect(302, '/login');
     }
 
-    const products = await prisma.product.findMany({
-        include: { category: true }
-    })
-    const topings = await prisma.toping.findMany()
-    return { products, topings }
+    const [productsGroupedByCategory, topings] = await Promise.all([
+        // getAllProductWithCategory(),
+        getProductsGroupedByCategory(),
+        getAllTopping()
+    ])
+    return { productsGroupedByCategory, topings }
 }
 
 const addTransaction: Action = async (event) => {

@@ -22,6 +22,7 @@ model User {
     createdAt   DateTime    @default(now())
     updatedAt   DateTime    @updatedAt
     sessions    Session[]
+    transaction Transaction[]
 }
 
 model Session {
@@ -62,6 +63,8 @@ model Toping {
 model Transaction {
   id                  String  @id   @default(uuid())
   total_price         Int     
+  userId              String?
+  user                User? @relation(fields: [userId], references: [id], onDelete: SetNull)
   productTransaction  ProductTransaction[]
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt

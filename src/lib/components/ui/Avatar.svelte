@@ -5,13 +5,15 @@
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
 	import type { SubmitFunction } from "@sveltejs/kit";
 	import { onMount } from "svelte";
+    
+    export let user: App.Locals["user"]
+    export let shouldHideOnMobile = false
 
     let img: string|undefined
     onMount(() => {
         img = createGradientAvatar(document)
     })
-    export let user: App.Locals["user"]
-
+    
     let processing = false
     const handleLogout: SubmitFunction = () => {
         processing = true
@@ -25,7 +27,7 @@
 </script>
 
 <DropdownMenu.Root>
-    <DropdownMenu.Trigger class="flex items-center justify-center text-center">
+    <DropdownMenu.Trigger class="flex items-center justify-center text-center {shouldHideOnMobile ? 'hidden md:block' : ''}">
         <Avatar.Root class="h-6 w-6 sm:h-8 sm:w-8">
             <Avatar.Image src={img} alt="@shadcn" />
             <Avatar.Fallback>{getFistCharFromName(user?.name)}</Avatar.Fallback>

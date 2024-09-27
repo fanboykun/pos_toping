@@ -25,7 +25,7 @@ type DummyToping = {
 
 async function main() {
 
-    await insertUser()
+    const user = await insertUser()
 
     await prisma.category.deleteMany()
     const dummyCategories = createDummyCategory()
@@ -52,7 +52,8 @@ async function main() {
     const dummyTransaction = createDummyTransaction(dummyProducts, dummyTopings)
     const transaction =  await prisma.transaction.create({
         data: {
-            total_price: dummyTransaction.total_price
+            total_price: dummyTransaction.total_price,
+            userId: user.id
         }
     })
     if(!transaction) return
