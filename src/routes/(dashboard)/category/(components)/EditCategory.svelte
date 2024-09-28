@@ -64,7 +64,7 @@
           </div>
         </div>
         <Dialog.Footer class="flex justify-between mt-4">
-          <Button variant="outline" on:click={closeModal}>Cancel</Button>
+          <Button variant="outline" on:click={closeModal}>Batal</Button>
           <Button type="submit" disabled={updating} class="flex gap-1">
             <span>Update</span>
             {#if updating}

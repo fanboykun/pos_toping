@@ -65,7 +65,7 @@ const onActionModalCLose = (modal: 'add'|'delete'|'edit') => {
                     {#if data.user?.isAdmin}
                     <button type="button" on:click={() => isAddToppingModalOpen = true} class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
                       <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
-                      Create
+                      Tambah
                     </button>
                     {/if}
                   </div>
@@ -81,7 +81,7 @@ const onActionModalCLose = (modal: 'add'|'delete'|'edit') => {
                     <th scope="col" class="px-6 py-3 text-start">
                       <div class="flex items-center gap-x-2">
                         <span class="text-xs font-semibold uppercase tracking-wide text-gray-800 dark:text-neutral-200">
-                          Name
+                          Nama
                         </span>
                       </div>
                     </th>
@@ -89,7 +89,7 @@ const onActionModalCLose = (modal: 'add'|'delete'|'edit') => {
                     <th scope="col" class="px-6 py-3 text-start">
                       <div class="flex items-center gap-x-2">
                         <span class="text-xs font-semibold uppercase tracking-wide text-gray-800 dark:text-neutral-200">
-                          Price
+                          Harga
                         </span>
                       </div>
                     </th>
@@ -97,7 +97,7 @@ const onActionModalCLose = (modal: 'add'|'delete'|'edit') => {
                     <th scope="col" class="px-6 py-3 text-start">
                       <div class="flex items-center gap-x-2">
                       <span class="text-xs font-semibold uppercase tracking-wide text-gray-800 dark:text-neutral-200">
-                          Created
+                          Dibuat Pada
                       </span>
                       </div>
                     </th>
