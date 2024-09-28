@@ -3,7 +3,7 @@
 	import type { ProductsGroupedByCategory } from "$lib/server/product";
 
     export let categories: ProductsGroupedByCategory
-    export let onCategorySelected: Function
+    export let onCategorySelected: (cId: string|undefined) => any
     let selectedCID: string|undefined = undefined
     const color = [
         {
@@ -39,7 +39,7 @@
         const randomIndex = Math.floor(Math.random() * color.length);
         return color[randomIndex];
     }
-    const setCategory = (cId: string|undefined = undefined) => {
+    const setCategory = (cId: string|undefined = undefined): (cId: string|undefined) => any => {
         selectedCID = cId
         return onCategorySelected(cId)
     }

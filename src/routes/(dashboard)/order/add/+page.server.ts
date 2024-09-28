@@ -11,11 +11,7 @@ export const load = async ( { locals } ) => {
         return redirect(302, '/login');
     }
 
-    const [productsGroupedByCategory, topings] = await Promise.all([
-        // getAllProductWithCategory(),
-        getProductsGroupedByCategory(),
-        getAllTopping()
-    ])
+    const [productsGroupedByCategory, topings] = [getProductsGroupedByCategory(), getAllTopping()]
     return { productsGroupedByCategory, topings }
 }
 
@@ -38,7 +34,7 @@ const addTransaction: Action = async (event) => {
         return { transaction, message: 'success', success: true }
     } catch(err) {
         console.log(err)
-        return { message: 'error' }
+        return { message: 'error', success: false }
     }
 
 }

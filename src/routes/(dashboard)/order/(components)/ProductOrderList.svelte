@@ -1,6 +1,5 @@
 <script lang="ts">
     import * as Card from "$lib/components/ui/card";
-	import type { TrasactionWithProductWithToping } from "$lib/server/transaction";
 
 </script>
 

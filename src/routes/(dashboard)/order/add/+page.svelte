@@ -6,21 +6,32 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { applyAction, enhance } from '$app/forms';
 	import type { SubmitFunction } from '@sveltejs/kit';
-	import { goto } from '$app/navigation';
+	import { beforeNavigate, goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import ProductCategoryList from './(components)/ProductCategoryList.svelte';
 	import ProductList from './(components)/ProductList.svelte';
 	import OrderMenu from './(components)/OrderMenu.svelte';
 	import { horizontalSlide } from '$lib/client/transition';
+	import LoadingState from '$lib/components/ui/LoadingState.svelte';
+	import type { ProductsGroupedByCategory } from '$lib/server/product';
+	import ErrorState from '$lib/components/ui/ErrorState.svelte';
 
     export let data
-    console.log(data)
-    
-    let isDialogOpen = false
-    let currenSelectedProductTempId: string|undefined
+    export let form
 
-    onMount(() => {
+    let isDialogOpen = false
+    let currentSelectedProductTempId: string|undefined
+
+    $: filteredProducts = [] as Product[]
+    
+    onMount(async () => {
         $makeTransaction.userId = data.user?.id
+        const productsGroupedByCategory = await data.productsGroupedByCategory
+        filteredProducts = filterCategory(undefined, productsGroupedByCategory)
+    })
+    
+    beforeNavigate(() => {
+        resetMakeTransaction()
     })
 
     const addProduct = (product: Product|MakeTransactionProduct, temp_id?: string, addition: boolean = true) => {
@@ -31,7 +42,7 @@
         }else {
             updateOrAddProduct(temp_id, product, addition)
         }
-        currenSelectedProductTempId = temp_id
+        currentSelectedProductTempId = temp_id
     }
 
     const removeProduct = (product: MakeTransactionProduct, temp_id: string|undefined) => {
@@ -40,16 +51,16 @@
     }
 
     const addToping = (toping: Toping|MakeTransactionToping, addition: boolean = true ) => {
-        if(!currenSelectedProductTempId) return
-       updateOrAddTopping(currenSelectedProductTempId, toping, addition)
+        if(!currentSelectedProductTempId) return
+        updateOrAddTopping(currentSelectedProductTempId, toping, addition)
     }
 
     const removeToping = (toping: MakeTransactionToping) => {
-        if(!currenSelectedProductTempId) return
-       updateOrAddTopping(currenSelectedProductTempId, toping, false, 0)
+        if(!currentSelectedProductTempId) return
+       updateOrAddTopping(currentSelectedProductTempId, toping, false, 0)
     }
 
-    let processing = false
+    let processing = false  // form submitting state
     const handleAddTransaction: SubmitFunction = ( { formData, cancel } ) => {
         processing = true
         formData.append('data', JSON.stringify($makeTransaction))
@@ -67,46 +78,42 @@
         $makeTransaction.userId = ''
         $makeTransaction.total_price = 0
         $makeTransaction.products = []
-        currenSelectedProductTempId = undefined
+        currentSelectedProductTempId = undefined
     }
 
-    $: categories = data.productsGroupedByCategory
-    $: filteredProducts = [] as Product[]
-    
-    onMount(() => {
-        filterProducts()
-    })
-    const filterCategory = (selectedCategoryId: string|undefined = undefined) => {
+    const filterCategory = (selectedCategoryId: string|undefined = undefined, productsGroupedByCategory: ProductsGroupedByCategory) => {
         if (!selectedCategoryId) {
             // Return all products if no category is selected
-            return categories.flatMap(category => category.products);
+            return productsGroupedByCategory.flatMap(category => category.products);
         }
 
         // Return products for the selected category
-        const category = categories.find(category => category.categoryId === selectedCategoryId);
+        const category = productsGroupedByCategory.find(category => category.categoryId === selectedCategoryId);
         return category ? category.products : [];
     }
 
-    const filterProducts = (selectedCategoryId: string|undefined = undefined) => {
-        return filteredProducts = filterCategory(selectedCategoryId)
-    }
-
-    let selectedMenu: 'product'|'cart' = 'product'
+    let transitionProps = { duration: 500, axis: 'x' }  // change menu transition props
+    let selectedMenu: 'product'|'cart' = 'product'  // change menu on mobile
     const changeMenu = (menu: 'product'|'cart' = 'product') => {
         selectedMenu = menu
     }
 
-    let transitionProps = { duration: 500, axis: 'x' }
+    $: console.log($makeTransaction)
+
 
 </script>
+{#await data.productsGroupedByCategory}
+    <LoadingState />
+{:then productsGroupedByCategory} 
 <div class="grid grid-cols-2 sm:grid-cols-6 gap-2 w-full p-4 h-auto min-h-[80svh] max-h-[90svh] place-content-start">
 
     <OrderMenu onMenuChanged={changeMenu} />
     {#key selectedMenu}
     <div in:horizontalSlide={{ ...transitionProps }} class="col-span-2 sm:col-span-4 w-full h-full min-h-max gap-4 p-2 border shadow-lg rounded-xl {selectedMenu == 'product' ? 'flex flex-col' : 'hidden'}">
-        {#if categories}
-        <ProductCategoryList categories={categories} onCategorySelected={filterProducts} />
+        {#if productsGroupedByCategory}
+        <ProductCategoryList categories={productsGroupedByCategory} onCategorySelected={(cId) => { filteredProducts = filterCategory(cId, productsGroupedByCategory) }} />
         <div class="h-full w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 px-2 gap-4 max-h-[65svh] sm:max-h-[75svh] overflow-auto justify-self-start">
+            <!-- {filteredProducts = filterProducts(undefined, productsGroupedByCategory)} -->
             {#each filteredProducts as product}
             {@const isSelected = $makeTransaction.products.find(item => item.id === product.id) != undefined}
             <ProductList {product} {isSelected}>
@@ -131,7 +138,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-5 text-indigo-600">
                             <path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0 0 21.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 0 0 3.065 7.097A9.716 9.716 0 0 0 12 21.75a9.716 9.716 0 0 0 6.685-2.653Zm-12.54-1.285A7.486 7.486 0 0 1 12 15a7.486 7.486 0 0 1 5.855 2.812A8.224 8.224 0 0 1 12 20.25a8.224 8.224 0 0 1-5.855-2.438ZM15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" clip-rule="evenodd" />
                         </svg>                      
-                        <span class="text-gray-700 font-medium">Cashier</span>
+                        <span class="text-gray-700 font-medium">Kasir</span>
                     </div>
                     <span class="font-medium text-gray-700">{data.user?.name ?? 'Unknown'}</span>
                 </div>
@@ -141,7 +148,7 @@
                             <path d="M4.5 3.75a3 3 0 0 0-3 3v.75h21v-.75a3 3 0 0 0-3-3h-15Z" />
                             <path fill-rule="evenodd" d="M22.5 9.75h-21v7.5a3 3 0 0 0 3 3h15a3 3 0 0 0 3-3v-7.5Zm-18 3.75a.75.75 0 0 1 .75-.75h6a.75.75 0 0 1 0 1.5h-6a.75.75 0 0 1-.75-.75Zm.75 2.25a.75.75 0 0 0 0 1.5h3a.75.75 0 0 0 0-1.5h-3Z" clip-rule="evenodd" />
                         </svg>                                           
-                        <span class="text-gray-700 font-medium">Total Price</span>
+                        <span class="text-gray-700 font-medium">Total Harga</span>
                     </div>
                     <span class="font-medium text-gray-700">{formatCurrency($makeTransaction.total_price)}</span>
                 </div>
@@ -163,13 +170,13 @@
                                 </span>
                             </div>
                             <div class="flex items-center gap-x-1.5">
-                                <button type="button" on:click={() => addProduct($product, currenSelectedProductTempId, false)} class="size-6 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-md border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800" tabindex="-1" aria-label="Decrease" data-hs-input-number-decrement="">
+                                <button type="button" on:click={() => { currentSelectedProductTempId = $product.temp_id; addProduct($product, currentSelectedProductTempId, false) }} class="size-6 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-md border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800" tabindex="-1" aria-label="Decrease" data-hs-input-number-decrement="">
                                     <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <path d="M5 12h14"></path>
                                     </svg>
                                 </button>
                                 <input type="number" disabled={true} value={$product.quantity} class="p-0 w-6 bg-transparent border-0 text-gray-800 text-center focus:ring-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none dark:text-white" style="-moz-appearance: textfield;" aria-roledescription="Number field" data-hs-input-number-input="">
-                                <button type="button" on:click={() => addProduct($product, currenSelectedProductTempId, true)} class="size-6 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-md border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800" tabindex="-1" aria-label="Increase" data-hs-input-number-increment="">
+                                <button type="button" on:click={() => { currentSelectedProductTempId = $product.temp_id; addProduct($product, currentSelectedProductTempId, true)}} class="size-6 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-md border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800" tabindex="-1" aria-label="Increase" data-hs-input-number-increment="">
                                     <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <path d="M5 12h14"></path>
                                         <path d="M12 5v14"></path>
@@ -180,7 +187,7 @@
                         </div>
                         <!-- End Input Number -->
         
-                        {#each $product.topings as toping}
+                        {#each $product.topings as $toping}
                         <div class="px-4 py-1 flex flex-col gap-2 w-full">
                             <div class="flex gap-x-1 w-full items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
@@ -191,20 +198,20 @@
                                     <div class="w-full flex justify-between items-center gap-x-3">
                                     <div>
                                         <span class="flex gap-x-1 items-center font-medium text-sm text-gray-800 dark:text-white">
-                                        {capitalizeFirstLetterOfEachWord(toping.name ?? '')}
+                                        {capitalizeFirstLetterOfEachWord($toping.name ?? '')}
                                         </span>
                                         <span class="block text-xs text-gray-500 dark:text-neutral-400">
-                                        {formatCurrency(toping.total_price)}
+                                        {formatCurrency($toping.total_price)}
                                         </span>
                                     </div>
                                     <div class="flex items-center gap-x-1.5">
-                                        <button type="button" on:click={() => addToping(toping, false)} class="size-6 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-md border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800" tabindex="-1" aria-label="Decrease" data-hs-input-number-decrement="">
+                                        <button type="button" on:click={() => { currentSelectedProductTempId = $product.temp_id; addToping($toping, false) }} class="size-6 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-md border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800" tabindex="-1" aria-label="Decrease" data-hs-input-number-decrement="">
                                             <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                 <path d="M5 12h14"></path>
                                             </svg>
                                         </button>
-                                        <input type="number" disabled={true} value={toping.quantity} class="p-0 w-6 bg-transparent border-0 text-gray-800 text-center focus:ring-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none dark:text-white" style="-moz-appearance: textfield;" aria-roledescription="Number field" data-hs-input-number-input="">
-                                        <button type="button" on:click={() => addToping(toping)} class="size-6 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-md border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800" tabindex="-1" aria-label="Increase" data-hs-input-number-increment="">
+                                        <input type="number" disabled={true} value={$toping.quantity} class="p-0 w-6 bg-transparent border-0 text-gray-800 text-center focus:ring-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none dark:text-white" style="-moz-appearance: textfield;" aria-roledescription="Number field" data-hs-input-number-input="">
+                                        <button type="button" on:click={() => {currentSelectedProductTempId = $product.temp_id; addToping($toping) }} class="size-6 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-md border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800" tabindex="-1" aria-label="Increase" data-hs-input-number-increment="">
                                             <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                 <path d="M5 12h14"></path>
                                                 <path d="M12 5v14"></path>
@@ -217,7 +224,7 @@
                             </div>
                         </div>
                         {/each}
-                        <button type="button" class="flex gap-x-1 items-center justify-center px-2 py-1.5 text-sm font-medium bg-indigo-500 rounded-xl border w-full shadow-md text-white" on:click={() => { currenSelectedProductTempId = $product.temp_id; isDialogOpen = true }}>
+                        <button type="button" class="flex gap-x-1 items-center justify-center px-2 py-1.5 text-sm font-medium bg-indigo-500 rounded-xl border w-full shadow-md text-white" on:click={() => { currentSelectedProductTempId = $product.temp_id; isDialogOpen = true }}>
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-4 text-white">
                                 <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z" clip-rule="evenodd" />
                             </svg>          
@@ -226,7 +233,7 @@
         
                         <div class="flex justify-between items-center w-full">
                             <span class="pt-2 w-full h-full text-sm font-medium text-gray-700 ">Total: {formatCurrency($product.total_price)}</span>
-                            <button type="button" on:click={() => removeProduct($product, currenSelectedProductTempId)} class="px-2 py-2 rounded-xl bg-red-500 text-white w-fit">
+                            <button type="button" on:click={() => {  removeProduct($product, $product.temp_id) }} class="px-2 py-2 rounded-xl bg-red-500 text-white w-fit">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-4 text-white">
                                     <path fill-rule="evenodd" d="M16.5 4.478v.227a48.816 48.816 0 0 1 3.878.512.75.75 0 1 1-.256 1.478l-.209-.035-1.005 13.07a3 3 0 0 1-2.991 2.77H8.084a3 3 0 0 1-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 0 1-.256-1.478A48.567 48.567 0 0 1 7.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 0 1 3.369 0c1.603.051 2.815 1.387 2.815 2.951Zm-6.136-1.452a51.196 51.196 0 0 1 3.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 0 0-6 0v-.113c0-.794.609-1.428 1.364-1.452Zm-.355 5.945a.75.75 0 1 0-1.5.058l.347 9a.75.75 0 1 0 1.499-.058l-.346-9Zm5.48.058a.75.75 0 1 0-1.498-.058l-.347 9a.75.75 0 0 0 1.5.058l.345-9Z" clip-rule="evenodd" />
                                 </svg>                          
@@ -256,7 +263,13 @@
     {/key}
 
 </div>
+{:catch}
+    <ErrorState />
+{/await}
 
+{#await data.topings}
+<span class="sr-only">loading toppings data</span>    
+{:then topings} 
 <Dialog.Root bind:open={isDialogOpen} onOpenChange={() => isDialogOpen = !isDialogOpen}>
     <Dialog.Content class="sm:max-w-[425px] max-h-[90svh] overflow-auto">
       <Dialog.Header>
@@ -267,10 +280,10 @@
       </Dialog.Header>
       <div class="grid gap-4 py-4 max-h-[50svh] overflow-y-auto">
         <div class="flex flex-col gap-2">
-            {#if data.topings}
-            {#each data.topings as toping}
-            {@const hasSelected = $makeTransaction.products.find(item => item.temp_id === currenSelectedProductTempId)?.topings.find(item => item.id === toping.id)}
-            {@const quantity = $makeTransaction.products.find(item => item.temp_id === currenSelectedProductTempId)?.topings.find(item => item.id === toping.id)?.quantity}
+            {#if topings}
+            {#each topings as toping}
+            {@const hasSelected = $makeTransaction.products.find(item => item.temp_id === currentSelectedProductTempId)?.topings.find(item => item.id === toping.id)}
+            {@const quantity = $makeTransaction.products.find(item => item.temp_id === currentSelectedProductTempId)?.topings.find(item => item.id === toping.id)?.quantity}
             <!-- Input Number -->
                 <div class="py-2 px-3 bg-white border border-gray-200 rounded-lg dark:bg-neutral-900 dark:border-neutral-700" data-hs-input-number="">
                     <div class="w-full flex justify-between items-center gap-x-3">
@@ -313,3 +326,4 @@
       </Dialog.Footer>
     </Dialog.Content>
 </Dialog.Root>
+{/await}

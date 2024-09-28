@@ -1,5 +1,6 @@
 import type { Product, Toping } from "@prisma/client"
 import { writable, type Writable } from "svelte/store"
+import type { TrasactionWithProductWithToping } from "./server/transaction"
 
 export type MakeTransactionToping = {
     id: string,
@@ -150,6 +151,32 @@ export function recalculateTotalPrice(transaction: MakeTransaction) {
 
     // Recalculate the total price for the entire transaction
     transaction.total_price = transaction.products.reduce((total, p) => total + p.total_price, 0);
+}
+
+// Function to prepare the make transaction store to prepare and perform editing the order data
+export function prepareMakeTransaction(transaction: NonNullable<TrasactionWithProductWithToping>): MakeTransaction {
+    const temporaryMakeTransaciton: MakeTransaction = {
+        userId: transaction?.userId ?? '',
+        total_price: transaction?.total_price ?? 0,
+        products: transaction.productTransaction.map(product => ({
+            temp_id: product.id, // temp_id,
+            id: product.productId,  // product_id
+            name: product.product.name,
+            quantity: product.quantity,
+            price: product.product.price,
+            total_price: product.total,
+            topings: product.productTopingTransaction.map(toping => ({
+                id: toping.toping.id,
+                name: toping.toping.name,
+                quantity: toping.quantity,
+                price: toping.toping.price,
+                total_price: toping.total,
+            }))
+        }))
+    }
+        
+
+    return temporaryMakeTransaciton
 }
 
 

@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { capitalizeFirstLetterOfEachWord, createGradientAvatar, formatCurrency, formatDay, formatTime, getFistCharFromName } from "$lib";
 	import { logicalPropertiesHorizontalSlide } from "$lib/client/transition.js";
-	import type { TrasactionWithProductWithToping } from "$lib/server/transaction";
 	import { fly } from "svelte/transition";
   import * as Avatar from "$lib/components/ui/avatar";
 	import ProductOrderList from "./(components)/ProductOrderList.svelte";
@@ -15,7 +14,6 @@
   export let data
   export let form
 
-  // const transactions: TrasactionWithProductWithToping = data.transactions
   let openedItem: string|undefined
 
   const showHideItem = (transactionId: string) => {
@@ -77,7 +75,7 @@
   
                   <a href="order/add" class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
                     <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
-                    Create
+                    Tambah
                   </a>
                 </div>
               </div>
@@ -92,7 +90,7 @@
                     <th scope="col" class="px-6 py-3 text-start">
                         <div class="flex items-center gap-x-2">
                             <span class="text-xs font-semibold uppercase tracking-wide text-gray-800 dark:text-neutral-200">
-                            Show Item
+                            Item
                             </span>
                         </div>
                     </th>
@@ -100,7 +98,7 @@
                     <th scope="col" class="px-6 py-3 text-start">
                         <div class="flex items-center gap-x-2">
                         <span class="text-xs font-semibold uppercase tracking-wide text-gray-800 dark:text-neutral-200">
-                            Created by
+                            Dibuat Oleh
                         </span>
                         </div>
                     </th>
@@ -124,7 +122,7 @@
                     <th scope="col" class="px-6 py-3 text-start">
                         <div class="flex items-center gap-x-2">
                         <span class="text-xs font-semibold uppercase tracking-wide text-gray-800 dark:text-neutral-200">
-                            Created
+                            Dibuat Pada
                         </span>
                         </div>
                     </th>
@@ -142,7 +140,7 @@
                     <td class="size-px whitespace-nowrap">
                         <div class="px-6 py-3">
                           <button type="button" on:click={() => showHideItem(transaction.id)} class="py-2 px-3 inline-flex items-center gap-x-2 text-xs rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800">
-                            Show Item
+                            Lihat
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="shrink-0 size-4 text-gray-400 dark:text-neutral-600">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />

@@ -3,7 +3,8 @@ import { PrismaClient } from '@prisma/client'
 import { Prisma } from '@prisma/client'
 const prisma = new PrismaClient()
 
-export type TrasactionWithProductWithToping = Prisma.PromiseReturnType<typeof getAllTransaction>
+export type TrasactionsWithProductWithToping = Prisma.PromiseReturnType<typeof getAllTransaction>
+export type TrasactionWithProductWithToping = Prisma.PromiseReturnType<typeof findTransactionWithProductAndToping>
 
 export const getAllTransaction = async ( skip: number = 0, take: number|undefined = undefined ) => {
     const transactionInclude = {
@@ -156,9 +157,15 @@ export const findTransactionWithProductAndToping = async (transactionId: string)
                 id: transactionId
             },
             include: {
+                user: true, 
                 productTransaction: {
                   include: {
-                    productTopingTransaction: true,
+                    product: true,
+                    productTopingTransaction: {
+                        include: {
+                            toping: true
+                        }
+                    },
                   },
                 },
             },
