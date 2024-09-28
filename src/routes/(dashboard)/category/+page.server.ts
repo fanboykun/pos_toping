@@ -9,7 +9,7 @@ export const load = async ( { locals } ) => {
         return redirect(302, '/login');
     }
 
-    const categories = CategoryFunction.getAllCategory()
+    const categories = CategoryFunction.getAllCategoryWithProductCount()
     return { categories }
 }
 

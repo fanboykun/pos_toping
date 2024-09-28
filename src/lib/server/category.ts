@@ -15,6 +15,27 @@ export const getAllCategory = async () => {
     }
 }
 
+export const getAllCategoryWithProductCount = async () => {
+    try {
+        const categories = await prisma.category.findMany({
+            orderBy: {createdAt: 'desc'},
+            select: {
+                id: true,
+                name: true,
+                createdAt: true,
+                updatedAt: true,
+                _count: {
+                    select: { products: true }
+                }
+            }
+        })
+        return categories
+    } catch(err) {
+        console.log(err)
+        return null
+    }
+}
+
 export const addNewCategory = async (data: Prisma.CategoryCreateInput) => {
     try {
         const category = await prisma.category.create({

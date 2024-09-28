@@ -79,7 +79,7 @@ const onActionModalCLose = (modal: 'add'|'delete'|'edit') => {
                     {capitalizeFirstLetterOfEachWord(category.name)}
                   </p>
                   <p class="text-gray-500 text-sm">
-                    3 Produk
+                    {category._count.products} Produk
                   </p>
                   {#if data.user?.isAdmin}
                   <div class="flex justify-end items-end gap-x-2">
