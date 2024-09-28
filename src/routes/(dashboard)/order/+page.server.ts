@@ -1,13 +1,24 @@
+import { Pagination } from '$lib/pagination';
 import * as TransactionFunction from '$lib/server/transaction'
 import { fail, redirect, type Action, type Actions } from '@sveltejs/kit';
 
-export const load = async ( { locals } ) => {
+export const load = async ( { locals, url } ) => {
     if ( !locals.session || locals.user === null  ) {
         return redirect(302, '/login');
     }
 
-    const transactions = await TransactionFunction.getAllTransaction()
-    return { transactions }
+    const transactionCount = await TransactionFunction.getTransactionsCount()
+    const paginate = new Pagination(transactionCount, 10, url.pathname)
+    let currentPageFromParam = Number(url.searchParams.get('page'))
+    if(isNaN(currentPageFromParam) || currentPageFromParam == 0) { currentPageFromParam = 1 }
+    paginate.move(Number(currentPageFromParam))
+
+    const transactions = TransactionFunction.getAllTransaction(paginate.pagination.skip, paginate.pagination.take)
+    return {
+        transactions: transactions,
+        transactionCount: transactionCount,
+        pagination: paginate.pagination
+    }
 }
 
 const deleteOrder: Action = async ({ request }) => {

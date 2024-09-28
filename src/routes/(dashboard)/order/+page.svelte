@@ -7,11 +7,15 @@
 	import ProductOrderList from "./(components)/ProductOrderList.svelte";
 	import ToppingOrderList from "./(components)/ToppingOrderList.svelte";
 	import DeleteOrder from "./(components)/DeleteOrder.svelte";
+	import ErrorState from "$lib/components/ui/ErrorState.svelte";
+	import TableEmptyState from "$lib/components/ui/TableEmptyState.svelte";
+	import LoadingState from "$lib/components/ui/LoadingState.svelte";
+	import TablePagination from "$lib/components/ui/TablePagination.svelte";
 
   export let data
   export let form
 
-  const transactions: TrasactionWithProductWithToping = data.transactions
+  // const transactions: TrasactionWithProductWithToping = data.transactions
   let openedItem: string|undefined
 
   const showHideItem = (transactionId: string) => {
@@ -38,11 +42,14 @@
       isEditTransactionModalOpen = false;
       break
   }
+
 }
 
 </script>
 
-
+{#await data.transactions}
+  <LoadingState />
+{:then transactions} 
 <!-- Table Section -->
 <div class="max-w-[85rem] px-4 pt-4 sm:px-6 lg:px-8 xl:pb-4 pb-[100px] mx-auto">
     <!-- Card -->
@@ -127,6 +134,8 @@
               </thead>
   
               <tbody class="divide-y divide-gray-200 dark:divide-neutral-700">
+
+                {#if transactions}
                 {#each transactions as transaction}
                 <tr>
 
@@ -217,52 +226,20 @@
                               </ProductOrderList>
                             {/each}
                           </div> 
-                            <!-- <div in:logicalPropertiesHorizontalSlide={{direction: 'inline', duration: 800}} class="grid whitespace-nowrap md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 p-2 gap-2 w-full min-h-[200px] bg-gray-200">
-                                {#each transaction.productTransaction as productTransaction}
-                                <div class="flex flex-col gap-2 bg-neutral-50 border p-2 rounded-md">
-                                    <p class="flex justify-start items-center gap-1"> <span>{productTransaction.quantity}</span> <span class="font-semibold"> {productTransaction.product.name} </span> <span class="text-xs">({formatCurrency(productTransaction.product.price)})</span>  </p>
-                                    {#if productTransaction.productTopingTransaction}
-                                        <div class="px-4 py-2 bg-neutral-100 flex flex-col text-sm rounded-lg h-full">
-                                            {#each productTransaction.productTopingTransaction as productTopingTransaction}
-                                                <p class="flex gap-2 items-center justify-even text-sm font-medium">{capitalizeFirstLetterOfEachWord(productTopingTransaction.toping.name)} <span class="text-xs leading-tight font-normal">x{productTopingTransaction.quantity}</span> <span class="text-xs font-normal">{formatCurrency(productTopingTransaction.total)}</span>  </p>
-                                            {/each}
-                                        </div>
-                                        {/if}
-                                    <p class="text-sm">Total: <span class="font-medium">{formatCurrency(productTransaction.total)}</span></p>
-                                </div>
-                                {/each}
-                            </div> -->
                         </td>
                     </tr>
                 {/if}
                 {/each}
+                {:else}
+                <TableEmptyState />
+                {/if}
 
               </tbody>
             </table>
             <!-- End Table -->
   
             <!-- Footer -->
-            <div class="px-6 py-4 grid gap-3 md:flex md:justify-between md:items-center border-t border-gray-200 dark:border-neutral-700">
-              <div>
-                <p class="text-sm text-gray-600 dark:text-neutral-400">
-                  <span class="font-semibold text-gray-800 dark:text-neutral-200">6</span> results
-                </p>
-              </div>
-  
-              <div>
-                <div class="inline-flex gap-x-2">
-                  <button type="button" class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-700 dark:focus:bg-neutral-700">
-                    <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-                    Prev
-                  </button>
-  
-                  <button type="button" class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-700 dark:focus:bg-neutral-700">
-                    Next
-                    <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-                  </button>
-                </div>
-              </div>
-            </div>
+            <TablePagination pagination={data.pagination} />
             <!-- End Footer -->
           </div>
         </div>
@@ -273,5 +250,9 @@
   <!-- End Table Section -->
 
 <DeleteOrder isOpen={isDeleteTransactionModalOpen} transactionId={selectedTransactionId} {form} onClose={() => onActionModalCLose('delete')} />
+{:catch}
+  <ErrorState />
+{/await}
+
 
 

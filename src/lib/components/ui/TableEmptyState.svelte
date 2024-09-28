@@ -1,4 +1,4 @@
-<div class="p-2">
+<div class="p-2 w-full">
   <div class="min-h-20 sm:min-h-40 md:min-h-80 p-4 flex flex-col bg-white border shadow-sm rounded-xl">
       <div class="flex flex-auto flex-col justify-center items-center p-4 md:p-5">
         <svg class="size-10 text-gray-500 dark:text-neutral-500" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">

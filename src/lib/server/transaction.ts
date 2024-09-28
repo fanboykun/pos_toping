@@ -5,32 +5,49 @@ const prisma = new PrismaClient()
 
 export type TrasactionWithProductWithToping = Prisma.PromiseReturnType<typeof getAllTransaction>
 
-export const getAllTransaction = async () => {
-    const transactions = await prisma.transaction.findMany({
-        orderBy: {
-            createdAt: 'desc'
+export const getAllTransaction = async ( skip: number = 0, take: number|undefined = undefined ) => {
+    const transactionInclude = {
+        user: {
+            select: {
+                id: true,
+                name: true,
+                email:true
+            }
         },
-        include: {
-            user: {
-                select: {
-                    id: true,
-                    name: true,
-                    email:true
-                }
-            },
-            productTransaction: {
-                include: {
-                    product: true,
-                    productTopingTransaction: {
-                        include: {
-                            toping: true
-                        }
+        productTransaction: {
+            include: {
+                product: true,
+                productTopingTransaction: {
+                    include: {
+                        toping: true
                     }
                 }
             }
         }
+    }
+    const transactionGetLimit = {
+        skip: skip,
+        take: take,
+    }
+    if (take == undefined) delete transactionGetLimit.take
+
+    const transactions = await prisma.transaction.findMany({
+        orderBy: {
+            createdAt: 'desc'
+        },
+        include: { ...transactionInclude },
+        ...transactionGetLimit
     })
     return transactions
+}
+
+export const getTransactionsCount = async () => {
+    try {
+        return await prisma.transaction.count()
+    } catch(err) {
+        console.log(err)
+        return 0
+    }
 }
 
 export const saveTransaction = async (data: MakeTransaction) => {
