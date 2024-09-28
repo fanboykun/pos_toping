@@ -15,6 +15,7 @@
 	import LoadingState from '$lib/components/ui/LoadingState.svelte';
 	import type { ProductsGroupedByCategory } from '$lib/server/product';
 	import ErrorState from '$lib/components/ui/ErrorState.svelte';
+	import { toast } from 'svelte-sonner';
 
     export let data
     export let form
@@ -70,6 +71,13 @@
                 applyAction(result)
                 resetMakeTransaction()
                 return goto('/order')
+            } else if(result.type == 'failure') {
+                if(result.hasOwnProperty('data') && result?.data?.message !== undefined) {
+                    const message = result?.data?.message ?? 'Error Happened'
+                    toast('Failed', {
+                        description: message,
+                    })
+                }
             }
         }
     }
@@ -98,7 +106,16 @@
         selectedMenu = menu
     }
 
-    $: console.log($makeTransaction)
+    $: {
+      if(form?.success != undefined) {
+          let isSuccess = form.success as boolean
+          let toastMessage = isSuccess ? 'The Action Executed Successfully' : 'The Action Failed to Execute'
+          if(form.message && typeof form.message === 'string') toastMessage = form.message
+          toast(isSuccess ? 'Success' : 'Failed', {
+              description: toastMessage,
+          })
+      }
+    }
 
 
 </script>

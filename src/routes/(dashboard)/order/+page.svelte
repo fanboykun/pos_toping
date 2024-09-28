@@ -10,9 +10,21 @@
 	import TableEmptyState from "$lib/components/ui/TableEmptyState.svelte";
 	import LoadingState from "$lib/components/ui/LoadingState.svelte";
 	import TablePagination from "$lib/components/ui/TablePagination.svelte";
+	import { toast } from "svelte-sonner";
 
   export let data
   export let form
+
+  $: {
+      if(form?.success != undefined) {
+          let isSuccess = form.success as boolean
+          let toastMessage = isSuccess ? 'The Action Executed Successfully' : 'The Action Failed to Execute'
+          if(form.message && typeof form.message === 'string') toastMessage = form.message
+          toast(isSuccess ? 'Success' : 'Failed', {
+              description: toastMessage,
+          })
+      }
+    }
 
   let openedItem: string|undefined
 

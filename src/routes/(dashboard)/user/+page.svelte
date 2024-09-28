@@ -11,9 +11,21 @@
 	import DeleteUser from "./(components)/DeleteUser.svelte";
 	import EditUser from "./(components)/EditUser.svelte";
 	import EditUserPassword from "./(components)/EditUserPassword.svelte";
+	import { toast } from "svelte-sonner";
 
   export let data
   export let form
+
+  $: {
+      if(form?.success != undefined) {
+          let isSuccess = form.success as boolean
+          let toastMessage = isSuccess ? 'The Action Executed Successfully' : 'The Action Failed to Execute'
+          if(form.message && typeof form.message === 'string') toastMessage = form.message
+          toast(isSuccess ? 'Success' : 'Failed', {
+              description: toastMessage,
+          })
+      }
+  }
 
 let isDeleteUserModalOpen = false
 let isAddUserModalOpen = false

@@ -4,6 +4,7 @@
 	import type { SubmitFunction } from "@sveltejs/kit";
 	import type { ActionData } from "../$types";
 	import { applyAction, enhance } from "$app/forms";
+	import { toast } from "svelte-sonner";
 
     export let transactionId: string|undefined
     export let isOpen = false
@@ -27,6 +28,13 @@
             deleting = false
             if(result.type == 'success') {
               onClose()
+            } else if(result.type == 'failure') {
+                if(result.hasOwnProperty('data') && result?.data?.message !== undefined) {
+                    const message = result?.data?.message ?? 'Error Happened'
+                    toast('Failed', {
+                        description: message,
+                    })
+                }
             }
             applyAction(result)
         }

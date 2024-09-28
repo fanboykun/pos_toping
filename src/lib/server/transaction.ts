@@ -80,7 +80,7 @@ export const saveTransaction = async (data: MakeTransaction) => {
     }
 }
 
-export const updateTransaction = async (transactionId: string, validatedData: MakeTransaction) => {
+export const updateTransaction = async (transactionId: string, validatedData: MakeTransaction, existingProductIds: string[]) => {
     try {
         const transaction = await prisma.transaction.update({
             where: { id: transactionId },
@@ -96,7 +96,7 @@ export const updateTransaction = async (transactionId: string, validatedData: Ma
                     total: product.total_price,
                     productTopingTransaction: {
                       upsert: product.topings.map((topping) => ({
-                        where: { id: topping.id }, // Use primary key to identify toppings
+                        where: { id: topping.pt_id ?? '' }, // Use primary key to identify toppings
                         update: {
                           quantity: topping.quantity,
                           total: topping.total_price,
@@ -124,7 +124,8 @@ export const updateTransaction = async (transactionId: string, validatedData: Ma
                 })),
                 // Step 6: Detach old product relations that are no longer selected
                 deleteMany: {
-                  id: { notIn: validatedData.products.map((p) => p.temp_id) }, // Only keep existing products in the new data },
+                //   id: { notIn: validatedData.products.map((p) => p.temp_id) }, // Only keep existing products in the new data },
+                  id: { notIn: [...validatedData.products.map((p) => p.temp_id), ...existingProductIds] }, // Keep existing products and new products
                 },
               },
             },

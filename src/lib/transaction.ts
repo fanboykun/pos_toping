@@ -4,6 +4,7 @@ import type { TrasactionWithProductWithToping } from "./server/transaction"
 
 export type MakeTransactionToping = {
     id: string,
+    pt_id?: string, // productToppingTransactionId for updating toping in the selected product
     name?: string,
     quantity: number,
     price: number,
@@ -166,7 +167,8 @@ export function prepareMakeTransaction(transaction: NonNullable<TrasactionWithPr
             price: product.product.price,
             total_price: product.total,
             topings: product.productTopingTransaction.map(toping => ({
-                id: toping.toping.id,
+                id: toping.topingId,
+                pt_id: toping.id,
                 name: toping.toping.name,
                 quantity: toping.quantity,
                 price: toping.toping.price,
@@ -174,7 +176,6 @@ export function prepareMakeTransaction(transaction: NonNullable<TrasactionWithPr
             }))
         }))
     }
-        
 
     return temporaryMakeTransaciton
 }

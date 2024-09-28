@@ -15,9 +15,21 @@
 	import LoadingState from '$lib/components/ui/LoadingState.svelte';
 	import type { ProductsGroupedByCategory } from '$lib/server/product';
 	import ErrorState from '$lib/components/ui/ErrorState.svelte';
+	import { toast } from 'svelte-sonner';
 
     export let data
     export let form
+
+    $: {
+      if(form?.success != undefined) {
+          let isSuccess = form.success as boolean
+          let toastMessage = isSuccess ? 'The Action Executed Successfully' : 'The Action Failed to Execute'
+          if(form.message && typeof form.message === 'string') toastMessage = form.message
+          toast(isSuccess ? 'Success' : 'Failed', {
+              description: toastMessage,
+          })
+      }
+    }
 
     let isDialogOpen = false
     let currentSelectedProductTempId: string|undefined
@@ -71,11 +83,19 @@
         formData.append('data', JSON.stringify($makeTransaction))
         formData.append('transactionId', data.transaction.id)
         return async ( { result } ) => {
+            console.log(result)
             if(result.type == "success") {
                 processing = true
                 applyAction(result)
                 resetMakeTransaction()
                 return goto('/order')
+            } else if(result.type == 'failure') {
+                if(result.hasOwnProperty('data') && result?.data?.message !== undefined) {
+                    const message = result?.data?.message ?? 'Error Happened'
+                    toast('Failed', {
+                        description: message,
+                    })
+                }
             }
         }
     }

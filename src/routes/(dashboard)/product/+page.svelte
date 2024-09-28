@@ -6,12 +6,24 @@
 	import ProductCard from '$lib/components/ui/ProductCard.svelte';
 	import TableEmptyState from '$lib/components/ui/TableEmptyState.svelte';
 	import type { ProductWithCategory } from '$lib/server/product';
+	import { toast } from 'svelte-sonner';
 	import CreateProduct from './(components)/CreateProduct.svelte';
 	import DeleteProduct from './(components)/DeleteProduct.svelte';
 	import EditProduct from './(components)/EditProduct.svelte';
 
   export let data
   export let form
+
+  $: {
+      if(form?.success != undefined) {
+          let isSuccess = form.success as boolean
+          let toastMessage = isSuccess ? 'The Action Executed Successfully' : 'The Action Failed to Execute'
+          if(form.message && typeof form.message === 'string') toastMessage = form.message
+          toast(isSuccess ? 'Success' : 'Failed', {
+              description: toastMessage,
+          })
+      }
+    }
   
   let isAddProductModalOpen = false
   let isDeleteProductModalOpen = false
