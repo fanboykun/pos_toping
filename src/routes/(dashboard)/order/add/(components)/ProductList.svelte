@@ -6,7 +6,7 @@
     export let isSelected: boolean = false 
 </script>
 
-<div class="relative mt-2">
+<div class="relative mt-2 w-full h-full">
   {#if isSelected}
   <div class="absolute -top-2 right-0">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6 text-indigo-600">

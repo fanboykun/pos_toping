@@ -10,6 +10,8 @@
 	import { onMount } from 'svelte';
 	import ProductCategoryList from './(components)/ProductCategoryList.svelte';
 	import ProductList from './(components)/ProductList.svelte';
+	import OrderMenu from './(components)/OrderMenu.svelte';
+	import { horizontalSlide } from '$lib/client/transition';
 
     export let data
     console.log(data)
@@ -70,6 +72,7 @@
 
     $: categories = data.productsGroupedByCategory
     $: filteredProducts = [] as Product[]
+    
     onMount(() => {
         filterProducts()
     })
@@ -88,29 +91,22 @@
         return filteredProducts = filterCategory(selectedCategoryId)
     }
 
+    let selectedMenu: 'product'|'cart' = 'product'
+    const changeMenu = (menu: 'product'|'cart' = 'product') => {
+        selectedMenu = menu
+    }
+
+    let transitionProps = { duration: 500, axis: 'x' }
+
 </script>
-<div class="grid grid-cols-1 sm:grid-cols-6 gap-2 w-full p-4 h-auto min-h-[80svh] max-h-[90svh]">
+<div class="grid grid-cols-2 sm:grid-cols-6 gap-2 w-full p-4 h-auto min-h-[80svh] max-h-[90svh] place-content-start">
 
-    <div class="col-span-6 sm:hidden flex gap-x-2 w-full h-fit px-4 py-0.5 shadow-sm rounded-xl items-center justify-center">
-        <Button type="button" variant="outline" class="flex gap-x-2">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-4 text-indigo-600">
-                <path fill-rule="evenodd" d="M7.5 6v.75H5.513c-.96 0-1.764.724-1.865 1.679l-1.263 12A1.875 1.875 0 0 0 4.25 22.5h15.5a1.875 1.875 0 0 0 1.865-2.071l-1.263-12a1.875 1.875 0 0 0-1.865-1.679H16.5V6a4.5 4.5 0 1 0-9 0ZM12 3a3 3 0 0 0-3 3v.75h6V6a3 3 0 0 0-3-3Zm-3 8.25a3 3 0 1 0 6 0v-.75a.75.75 0 0 1 1.5 0v.75a4.5 4.5 0 1 1-9 0v-.75a.75.75 0 0 1 1.5 0v.75Z" clip-rule="evenodd" />
-            </svg>              
-            Produk
-        </Button>
-        <Button type="button" variant="outline" class="flex gap-x-2">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-4 text-indigo-600">
-                <path d="M2.25 2.25a.75.75 0 0 0 0 1.5h1.386c.17 0 .318.114.362.278l2.558 9.592a3.752 3.752 0 0 0-2.806 3.63c0 .414.336.75.75.75h15.75a.75.75 0 0 0 0-1.5H5.378A2.25 2.25 0 0 1 7.5 15h11.218a.75.75 0 0 0 .674-.421 60.358 60.358 0 0 0 2.96-7.228.75.75 0 0 0-.525-.965A60.864 60.864 0 0 0 5.68 4.509l-.232-.867A1.875 1.875 0 0 0 3.636 2.25H2.25ZM3.75 20.25a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0ZM16.5 20.25a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0Z" />
-            </svg>              
-            Keranjang
-        </Button>
-    </div>
-
-    <div class="col-span-6 sm:col-span-4 w-full h-full flex flex-col gap-4 p-2 border shadow-lg rounded-xl">
+    <OrderMenu onMenuChanged={changeMenu} />
+    {#key selectedMenu}
+    <div in:horizontalSlide={{ ...transitionProps }} class="col-span-2 sm:col-span-4 w-full h-full min-h-max gap-4 p-2 border shadow-lg rounded-xl {selectedMenu == 'product' ? 'flex flex-col' : 'hidden'}">
         {#if categories}
         <ProductCategoryList categories={categories} onCategorySelected={filterProducts} />
-        <div class="h-full w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 px-2 gap-4 max-h-[65svh] sm:max-h-[75svh] overflow-auto">
-            <!-- {#each data.productsGroupedByCategory as productGrouped} -->
+        <div class="h-full w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 px-2 gap-4 max-h-[65svh] sm:max-h-[75svh] overflow-auto justify-self-start">
             {#each filteredProducts as product}
             {@const isSelected = $makeTransaction.products.find(item => item.id === product.id) != undefined}
             <ProductList {product} {isSelected}>
@@ -122,12 +118,11 @@
                   </button>
             </ProductList>
             {/each}
-            <!-- {/each} -->
         </div>
         {/if}
     </div>
     
-    <div class="col-span-2 w-full h-full hidden sm:flex flex-wrap gap-4 flex-col justify-between p-2 border shadow-lg rounded-xl">
+    <div in:horizontalSlide={{ ...transitionProps }} class="col-span-2 w-full h-full gap-4 justify-between p-2 border shadow-lg rounded-xl {selectedMenu == 'cart' ? 'flex flex-wrap flex-col' : 'hidden sm:flex flex-wrap flex-col'}">
 
         <div class=" flex flex-col gap-y-4">
             <div class="p-2 border rounded-xl shadow-md flex flex-col gap-y-2">
@@ -173,7 +168,7 @@
                                         <path d="M5 12h14"></path>
                                     </svg>
                                 </button>
-                                <input type="number" value={$product.quantity} class="p-0 w-6 bg-transparent border-0 text-gray-800 text-center focus:ring-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none dark:text-white" style="-moz-appearance: textfield;" aria-roledescription="Number field" data-hs-input-number-input="">
+                                <input type="number" disabled={true} value={$product.quantity} class="p-0 w-6 bg-transparent border-0 text-gray-800 text-center focus:ring-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none dark:text-white" style="-moz-appearance: textfield;" aria-roledescription="Number field" data-hs-input-number-input="">
                                 <button type="button" on:click={() => addProduct($product, currenSelectedProductTempId, true)} class="size-6 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-md border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800" tabindex="-1" aria-label="Increase" data-hs-input-number-increment="">
                                     <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <path d="M5 12h14"></path>
@@ -208,7 +203,7 @@
                                                 <path d="M5 12h14"></path>
                                             </svg>
                                         </button>
-                                        <input type="number" value={toping.quantity} class="p-0 w-6 bg-transparent border-0 text-gray-800 text-center focus:ring-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none dark:text-white" style="-moz-appearance: textfield;" aria-roledescription="Number field" data-hs-input-number-input="">
+                                        <input type="number" disabled={true} value={toping.quantity} class="p-0 w-6 bg-transparent border-0 text-gray-800 text-center focus:ring-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none dark:text-white" style="-moz-appearance: textfield;" aria-roledescription="Number field" data-hs-input-number-input="">
                                         <button type="button" on:click={() => addToping(toping)} class="size-6 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-md border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800" tabindex="-1" aria-label="Increase" data-hs-input-number-increment="">
                                             <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                 <path d="M5 12h14"></path>
@@ -256,16 +251,18 @@
             </form>
         </div>
         {/if}
+        
     </div>
+    {/key}
 
 </div>
 
 <Dialog.Root bind:open={isDialogOpen} onOpenChange={() => isDialogOpen = !isDialogOpen}>
     <Dialog.Content class="sm:max-w-[425px] max-h-[90svh] overflow-auto">
       <Dialog.Header>
-        <Dialog.Title>Add Toping to the Product</Dialog.Title>
+        <Dialog.Title>Tambah Topping ke produk</Dialog.Title>
         <Dialog.Description>
-            Select Topping
+            Pilih topping untuk di tambahkan
         </Dialog.Description>
       </Dialog.Header>
       <div class="grid gap-4 py-4 max-h-[50svh] overflow-y-auto">
@@ -296,7 +293,7 @@
                                 <path d="M5 12h14"></path>
                             </svg>
                         </button>
-                        <input type="number" value={ quantity ?? 0 } class="p-0 w-6 bg-transparent border-0 text-gray-800 text-center focus:ring-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none dark:text-white" style="-moz-appearance: textfield;" aria-roledescription="Number field" data-hs-input-number-input="">
+                        <input type="number" disabled={true} value={ quantity ?? 0 } class="p-0 w-6 bg-transparent border-0 text-gray-800 text-center focus:ring-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none dark:text-white" style="-moz-appearance: textfield;" aria-roledescription="Number field" data-hs-input-number-input="">
                         <button type="button" on:click={() => addToping(toping)} class="size-6 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-md border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800" tabindex="-1" aria-label="Increase" data-hs-input-number-increment="">
                             <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M5 12h14"></path>
@@ -312,7 +309,7 @@
         </div>
       </div>
       <Dialog.Footer>
-        <Button type="button" on:click={() => isDialogOpen = false}>Done</Button>
+        <Button type="button" on:click={() => isDialogOpen = false}>Selesai</Button>
       </Dialog.Footer>
     </Dialog.Content>
 </Dialog.Root>
