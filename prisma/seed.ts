@@ -123,7 +123,6 @@ const createDummyTopings = (howMuch: number = 10) => {
 
 const createDummyTransaction = (products: DummyProduct[], topings: DummyToping[]) => {
     const transaction: MakeTransaction = {
-        cashier_id: uuid(),
         total_price: 0,
         products: []
     }

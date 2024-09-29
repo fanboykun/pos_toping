@@ -2,16 +2,31 @@
 
 Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
 
-## Creating a project
+## Configuration
+    - mysql
+    - Nodejs
+  
+## Configuration
+> First, make sure you already make or have the database for this project
 
-If you're seeing this, you've probably already done this step. Congrats!
+Follow this steps to prepare the project
 
 ```bash
-# create a new project in the current directory
-npm create svelte@latest
+# copy the .env.example to .env file
+cp .env.example .env
+# then, input the database url in the .env
 
-# create a new project in my-app
-npm create svelte@latest my-app
+# install all of the dependencies
+pnpm i
+
+# migrate the prisma model to generate prisma types
+npx prisma migrate dev
+
+# or update/push the database schema
+npx prisma db push
+
+# seed the dummy data to the database
+npx prisma db seed
 ```
 
 ## Developing
@@ -19,11 +34,13 @@ npm create svelte@latest my-app
 Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
 
 ```bash
-npm run dev
+pnpm dev
 
 # or start the server and open the app in a new browser tab
-npm run dev -- --open
+pnpm dev --open
 ```
+> Then, Log in to the account with the seeded user (see seed.ts insertUser function)
+
 
 ## Building
 
