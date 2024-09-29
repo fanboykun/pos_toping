@@ -24,6 +24,17 @@
     let currentSelectedProductTempId: string|undefined
 
     $: filteredProducts = [] as Product[]
+
+    $: {
+      if(form?.success != undefined) {
+          let isSuccess = form.success as boolean
+          let toastMessage = isSuccess ? 'The Action Executed Successfully' : 'The Action Failed to Execute'
+          if(form.message && typeof form.message === 'string') toastMessage = form.message
+          toast(isSuccess ? 'Success' : 'Failed', {
+              description: toastMessage,
+          })
+      }
+    }
     
     onMount(async () => {
         $makeTransaction.userId = data.user?.id
@@ -65,19 +76,12 @@
     const handleAddTransaction: SubmitFunction = ( { formData, cancel } ) => {
         processing = true
         formData.append('data', JSON.stringify($makeTransaction))
-        return async ( { result } ) => {
+        return async ( { result, update } ) => {
+            processing = false
             if(result.type == "success") {
-                processing = true
-                applyAction(result)
                 resetMakeTransaction()
+                await update()
                 return goto('/order')
-            } else if(result.type == 'failure') {
-                if(result.hasOwnProperty('data') && result?.data?.message !== undefined) {
-                    const message = result?.data?.message ?? 'Error Happened'
-                    toast('Failed', {
-                        description: message,
-                    })
-                }
             }
         }
     }
@@ -104,17 +108,6 @@
     let selectedMenu: 'product'|'cart' = 'product'  // change menu on mobile
     const changeMenu = (menu: 'product'|'cart' = 'product') => {
         selectedMenu = menu
-    }
-
-    $: {
-      if(form?.success != undefined) {
-          let isSuccess = form.success as boolean
-          let toastMessage = isSuccess ? 'The Action Executed Successfully' : 'The Action Failed to Execute'
-          if(form.message && typeof form.message === 'string') toastMessage = form.message
-          toast(isSuccess ? 'Success' : 'Failed', {
-              description: toastMessage,
-          })
-      }
     }
 
 

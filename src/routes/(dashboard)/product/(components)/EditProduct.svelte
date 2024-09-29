@@ -44,7 +44,6 @@
           if(result.type == 'success') {
             onClose()
           }
-          applyAction(result)
       }
   }
 

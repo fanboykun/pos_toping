@@ -34,12 +34,6 @@
         updateTimePrecisely();
     });
 
-    const productStat = {
-        main: 30,
-        secondary: 'Item',
-        description: 'Total Produk'
-    }
-
 </script>
 
 <div class="max-w-[85rem] px-4 pt-4 sm:px-6 lg:px-8 xl:pb-4 pb-[100px] mx-auto">

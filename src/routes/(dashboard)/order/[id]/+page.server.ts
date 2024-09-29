@@ -112,6 +112,7 @@ const editTransaction: Action = async ( { request } ) => {
     const transactionId = String(form.get('transactionId'))
     let data: MakeTransaction|undefined
 
+    // parse MakeTransaction from the form (not the best way, but will do)
     try {
         data = JSON.parse(String(stringData)) ?? undefined as MakeTransaction|undefined
     } catch(err) {
@@ -120,16 +121,15 @@ const editTransaction: Action = async ( { request } ) => {
     }
     if(!data || !transactionId) return fail(401, { message: 'Form is invalid', success: false })
 
-    // Step 1: Validate and recalculate product and topping prices from the database
+    // Validate and recalculate product and topping prices from the database
     const validatedData = await validateAndRecalculateTransaction(data);
 
-    // Step 2: Fetch the existing transaction with all product and topping relations
+    // Fetch the existing transaction with all product and topping relations
     const existingTransaction = await TransactionFunction.findTransactionWithProductAndToping(transactionId)
     if(!existingTransaction) return fail(401, { message: 'Transaction could not been found!', success: false })
         
-    console.log("Products to retain:", validatedData.products.map(p => p.temp_id));
-    console.log({ ...validatedData })
-    // return fail(300, { message: 'Order Editing Is Not Allowed', data: {  ...validatedData }, existing: existingTransaction })
+    // console.log("Products to retain:", validatedData.products.map(p => p.temp_id));
+    // console.log({ ...validatedData })
 
     // check the existing products in the transaction in case they are removed from the transaction
     const existingProductTransactions = await prisma.productTransaction.findMany({

@@ -41,14 +41,6 @@ const login: Action = async ( { request, cookies } ) => {
         return fail(403, { message: 'Password is invalid', result, data: { ...data }, success: false } )
     }
 
-    //debug
-    const u = {
-        ...user,
-        p: data.password,
-        v: validPassword
-    }
-    console.log(u)
-
     // set the user session
     const session = await lucia.createSession(user.id, {});
     const sessionCookie = lucia.createSessionCookie(session.id);
@@ -56,8 +48,6 @@ const login: Action = async ( { request, cookies } ) => {
        path: ".",
        ...sessionCookie.attributes
     });
-
-    console.log('success')
 
     return redirect(302, '/dashboard')
 }

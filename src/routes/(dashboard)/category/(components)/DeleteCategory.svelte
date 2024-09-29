@@ -4,6 +4,7 @@
 	import type { SubmitFunction } from "@sveltejs/kit";
 	import type { ActionData } from "../$types";
 	import { applyAction, enhance } from "$app/forms";
+	import { toast } from "svelte-sonner";
 
     export let categoryId: string|undefined
     export let isOpen = false
@@ -23,12 +24,11 @@
         formData.append('categoryId', categoryId)
         deleting = true
         return async ( { result, update } ) => {
-            await update()
             deleting = false
             if(result.type == 'success') {
-              onClose()
+                await update()
+                onClose()
             }
-            applyAction(result)
         }
     }
 

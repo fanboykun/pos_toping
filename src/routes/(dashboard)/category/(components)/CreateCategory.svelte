@@ -3,7 +3,7 @@
   import * as Dialog from "$lib/components/ui/dialog";
   import { Input } from "$lib/components/ui/input";
   import { Label } from "$lib/components/ui/label";
-	import { applyAction, enhance } from "$app/forms";
+	import { enhance } from "$app/forms";
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import type { ActionData } from "../$types";
 	import InputError from "$lib/components/ui/InputError.svelte";
@@ -23,12 +23,11 @@
   const handleAddCategory: SubmitFunction = ( { formData } ) => {
           creating = true
           return async ( { result, update } ) => {
-              await update()
-              creating = false
-              if(result.type == 'success') {
+            creating = false
+            if(result.type == 'success') {
+                await update()
                 onClose()
-              }
-              applyAction(result)
+              } 
           }
   }
 

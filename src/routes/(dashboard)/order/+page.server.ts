@@ -1,8 +1,9 @@
 import { Pagination } from '$lib/pagination';
 import * as TransactionFunction from '$lib/server/transaction'
 import { fail, redirect, type Action, type Actions } from '@sveltejs/kit';
+import type { PageServerLoad } from './$types';
 
-export const load = async ( { locals, url } ) => {
+export const load:PageServerLoad = async ( { locals, url } ) => {
     if ( !locals.session || locals.user === null  ) {
         return redirect(302, '/login');
     }

@@ -80,57 +80,92 @@ export const saveTransaction = async (data: MakeTransaction) => {
     }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const updateTransaction = async (transactionId: string, validatedData: MakeTransaction, existingProductIds: string[]) => {
     try {
-        const transaction = await prisma.transaction.update({
-            where: { id: transactionId },
-            data: {
-              total_price: validatedData.total_price,
-              
-              // Step 5: Manage product transactions (update, create, or disconnect)
-              productTransaction: {
-                upsert: validatedData.products.map((product) => ({
-                  where: { id: product.temp_id },  // Using temp_id or unique id for upsert
-                  update: {
-                    quantity: product.quantity,
-                    total: product.total_price,
-                    productTopingTransaction: {
-                      upsert: product.topings.map((topping) => ({
-                        where: { id: topping.pt_id ?? '' }, // Use primary key to identify toppings
-                        update: {
-                          quantity: topping.quantity,
-                          total: topping.total_price,
-                        },
-                        create: {
-                          topingId: topping.id,
-                          quantity: topping.quantity,
-                          total: topping.total_price,
-                        },
-                      })),
-                    },
-                  },
-                  create: {
-                    productId: product.id,
-                    quantity: product.quantity,
-                    total: product.total_price,
-                    productTopingTransaction: {
-                      create: product.topings.map((topping) => ({
-                        topingId: topping.id,
-                        quantity: topping.quantity,
-                        total: topping.total_price,
-                      })),
-                    },
-                  },
-                })),
-                // Step 6: Detach old product relations that are no longer selected
-                deleteMany: {
-                //   id: { notIn: validatedData.products.map((p) => p.temp_id) }, // Only keep existing products in the new data },
-                  id: { notIn: [...validatedData.products.map((p) => p.temp_id), ...existingProductIds] }, // Keep existing products and new products
+         // Begin the transaction
+        const result = await prisma.$transaction( async (prisma) => {
+
+            // Delete unnecessary product transactions
+            await prisma.productTransaction.deleteMany({
+                where: {
+                    transactionId,
+                    id: { notIn: validatedData.products.map((p) => p.temp_id) }, // Only keep existing products
                 },
-              },
-            },
-          });
-        return transaction
+            });
+
+            // Collect all valid topping IDs (those that should remain in the database)
+            const validToppingIds: string[] = [];
+            const validProductTransactionIds: string[] = [];
+
+            for (const product of validatedData.products) {
+                if (product.temp_id) {
+                    validProductTransactionIds.push(product.temp_id);
+                    validToppingIds.push(...product.topings.map((topping) => topping.pt_id ?? ''));
+                }
+            }
+
+            // Delete all unnecessary toppings in one query
+            await prisma.productTopingTransaction.deleteMany({
+                where: {
+                    productTransactionId: { in: validProductTransactionIds },
+                    id: { notIn: validToppingIds.filter((id) => id !== '') }, // Only keep valid toppings
+                },
+            });
+            
+             // Upsert products and their toppings
+            const transaction = await prisma.transaction.update({
+                where: { id: transactionId },
+                data: {
+                  total_price: validatedData.total_price,
+                  
+                  // Step 5: Manage product transactions (update, create, or disconnect)
+                  productTransaction: {
+                    upsert: validatedData.products.map((product) => ({
+                      where: { id: product.temp_id },  // Using temp_id or unique id for upsert
+                      update: {
+                        quantity: product.quantity,
+                        total: product.total_price,
+                        productTopingTransaction: {
+                          upsert: product.topings.map((topping) => ({
+                            where: { id: topping.pt_id ?? '' }, // Use primary key to identify toppings
+                            update: {
+                              quantity: topping.quantity,
+                              total: topping.total_price,
+                            },
+                            create: {
+                              topingId: topping.id,
+                              quantity: topping.quantity,
+                              total: topping.total_price,
+                            },
+                          })),
+                        },
+                      },
+                      create: {
+                        productId: product.id,
+                        quantity: product.quantity,
+                        total: product.total_price,
+                        productTopingTransaction: {
+                          create: product.topings.map((topping) => ({
+                            topingId: topping.id,
+                            quantity: topping.quantity,
+                            total: topping.total_price,
+                          })),
+                        },
+                      },
+                    })),
+                    // Step 6: Detach old product relations that are no longer selected
+                    // deleteMany: {
+                    // //   id: { notIn: validatedData.products.map((p) => p.temp_id) }, // Only keep existing products in the new data },
+                    //   id: { notIn: [...validatedData.products.map((p) => p.temp_id), ...existingProductIds] }, // Keep existing products and new products
+                    // },
+                  },
+                },
+            });
+
+            return transaction  // Return the transaction result if successful
+        } )
+        return result
     } catch(err) {
         console.log(err)
         return null

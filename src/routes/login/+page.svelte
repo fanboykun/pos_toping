@@ -1,23 +1,41 @@
 <script lang="ts">
 	import { applyAction, enhance } from "$app/forms";
+	import { goto } from "$app/navigation";
 	import Button from "$lib/components/ui/button/button.svelte";
 	import Input from "$lib/components/ui/input/input.svelte";
 	import InputError from "$lib/components/ui/InputError.svelte";
 	import Label from "$lib/components/ui/label/label.svelte";
 	import type { SubmitFunction } from "@sveltejs/kit";
+	import { toast } from "svelte-sonner";
 
     export let form
-    let processing = false
-
+    
+    $: {
+      if(form?.success != undefined) {
+          let isSuccess = form.success as boolean
+          let toastMessage = isSuccess ? 'The Action Executed Successfully' : 'The Action Failed to Execute'
+          if(form.message && typeof form.message === 'string') toastMessage = form.message
+          toast(isSuccess ? 'Success' : 'Failed', {
+              description: toastMessage,
+          })
+      }
+  }
+    
     let isPasswordShown = false
     $: passwordInputType = isPasswordShown ? 'text' : 'password' as 'password'|'text'
-
+    
+    let processing = false
     const handleLogin: SubmitFunction = ( { formData } ) => {
         processing = true
         return async ( { result, update } ) => {
-            await update()
             processing = false
-            applyAction(result)
+            await update()
+            if(result.type == "redirect") {
+              toast('Success', {
+                description: 'Selamat Datang',
+              })
+              return goto(result.location)
+            }
         }
     }
 
@@ -27,9 +45,9 @@
     <div class="bg-white border border-gray-200 rounded-xl shadow-sm w-full max-w-sm p-4">
         <div class="p-4 sm:p-7">
           <div class="text-center">
-            <h1 class="block text-2xl font-bold text-gray-800 dark:text-white">Sign in</h1>
+            <h1 class="block text-2xl font-bold text-gray-800 dark:text-white">Log in</h1>
             <p class="mt-2 text-sm text-gray-600 dark:text-neutral-400">
-              Please fill the form to login to your account
+              Mohon isi form untuk login ke akun anda
             </p>
           </div>
       
@@ -42,7 +60,7 @@
                 <div class="grid w-full items-center gap-4">
                   <div class="flex flex-col space-y-1.5">
                     <Label for="email">Email</Label>
-                    <Input id="email" name="email" type="email" placeholder="Input Email" required autocomplete="email" />
+                    <Input id="email" name="email" type="email" placeholder="Email anda" required autocomplete="email" />
                     {#if form?.result?.email?.valid == false}
                       <InputError error={form?.result?.email?.message} />
                     {/if}
@@ -50,7 +68,7 @@
                   <div class="flex flex-col space-y-1.5">
                     <Label for="password">Password</Label>
                     <div class="flex gap-x-2">
-                        <Input id="password" name="password" placeholder="Input Password" type={passwordInputType} required />
+                        <Input id="password" name="password" placeholder="Password" type={passwordInputType} required />
                         <button type="button" class="border rounded-lg px-2" on:click={() => isPasswordShown = !isPasswordShown}>
                             {#if isPasswordShown}
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">

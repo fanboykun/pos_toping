@@ -8,6 +8,7 @@
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import type { ActionData } from "../$types";
 	import InputError from "$lib/components/ui/InputError.svelte";
+	import { toast } from "svelte-sonner";
 
   export let form: ActionData
   export let isOpen: boolean = false
@@ -28,12 +29,11 @@
       formData.append('id', category.id)
 
       return async ( { result, update } ) => {
+        updating = false
+        if(result.type == 'success') {
           await update()
-          updating = false
-          if(result.type == 'success') {
-            onClose()
-          }
-          applyAction(result)
+          onClose()
+        }
       }
   }
 
