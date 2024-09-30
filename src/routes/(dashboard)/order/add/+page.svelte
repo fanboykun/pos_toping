@@ -115,11 +115,11 @@
 {#await data.productsGroupedByCategory}
     <LoadingState />
 {:then productsGroupedByCategory} 
-<div class="grid grid-cols-2 sm:grid-cols-6 gap-2 w-full p-4 h-auto min-h-[80svh] max-h-[90svh] place-content-start">
+<div class="grid grid-cols-4 md:grid-cols-12 gap-2 w-full p-4 h-auto min-h-[80svh] max-h-[90svh] place-content-start">
 
     <OrderMenu onMenuChanged={changeMenu} />
     {#key selectedMenu}
-    <div in:horizontalSlide={{ ...transitionProps }} class="col-span-2 sm:col-span-4 w-full h-full min-h-max gap-4 p-2 border shadow-lg rounded-xl {selectedMenu == 'product' ? 'flex flex-col' : 'hidden'}">
+    <div in:horizontalSlide={{ ...transitionProps }} class="col-span-4 md:col-span-7 xl:col-span-8 w-full h-full min-h-max gap-4 p-2 border shadow-lg rounded-xl {selectedMenu == 'product' ? 'flex flex-col' : 'hidden'}">
         {#if productsGroupedByCategory}
         <ProductCategoryList categories={productsGroupedByCategory} onCategorySelected={(cId) => { filteredProducts = filterCategory(cId, productsGroupedByCategory) }} />
         <div class="h-full w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 px-2 gap-4 max-h-[65svh] sm:max-h-[75svh] overflow-auto justify-self-start">
@@ -139,7 +139,7 @@
         {/if}
     </div>
     
-    <div in:horizontalSlide={{ ...transitionProps }} class="col-span-2 w-full h-full gap-4 justify-between p-2 border shadow-lg rounded-xl {selectedMenu == 'cart' ? 'flex flex-wrap flex-col' : 'hidden sm:flex flex-wrap flex-col'}">
+    <div in:horizontalSlide={{ ...transitionProps }} class="col-span-4 md:col-span-5 xl:col-span-4 w-full h-full gap-4 justify-between p-2 border shadow-lg rounded-xl {selectedMenu == 'cart' ? 'flex flex-col' : 'hidden md:flex flex-col'}">
 
         <div class=" flex flex-col gap-y-4">
             <div class="p-2 border rounded-xl shadow-md flex flex-col gap-y-2">
@@ -169,7 +169,7 @@
                     <div class="border p-2 rounded-xl shadow-md flex flex-col gap-y-2">
         
                         <!-- Input Number -->
-                        <div class="py-2 px-3 bg-white border border-gray-200 rounded-lg dark:bg-neutral-900 dark:border-neutral-700" data-hs-input-number="">
+                        <div class="py-2 px-2 bg-white border border-gray-200 rounded-lg dark:bg-neutral-900 dark:border-neutral-700" data-hs-input-number="">
                             <div class="w-full flex justify-between items-center gap-x-3">
                             <div>
                                 <span class="flex gap-x-1 items-center font-medium text-sm text-gray-800 dark:text-white">
@@ -198,13 +198,13 @@
                         <!-- End Input Number -->
         
                         {#each $product.topings as $toping}
-                        <div class="px-4 py-1 flex flex-col gap-2 w-full">
+                        <div class="px-0 py-1 flex flex-col gap-2 w-full">
                             <div class="flex gap-x-1 w-full items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z" />
                                 </svg>                              
                                 <!-- Input Number -->
-                                <div class="w-full py-2 px-3 bg-white border border-gray-200 rounded-lg dark:bg-neutral-900 dark:border-neutral-700" data-hs-input-number="">
+                                <div class="w-full py-2 px-1 bg-white border border-gray-200 rounded-lg dark:bg-neutral-900 dark:border-neutral-700" data-hs-input-number="">
                                     <div class="w-full flex justify-between items-center gap-x-3">
                                     <div>
                                         <span class="flex gap-x-1 items-center font-medium text-sm text-gray-800 dark:text-white">

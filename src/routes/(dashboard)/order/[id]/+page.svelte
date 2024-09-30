@@ -121,11 +121,11 @@
 {#await data.productsGroupedByCategory}
     <LoadingState />
 {:then productsGroupedByCategory} 
-<div class="grid grid-cols-2 sm:grid-cols-6 gap-2 w-full p-4 h-auto min-h-[80svh] max-h-[90svh] place-content-start">
+<div class="grid grid-cols-4 md:grid-cols-12 gap-2 w-full p-4 h-auto min-h-[80svh] max-h-[90svh] place-content-start">
 
     <OrderMenu onMenuChanged={changeMenu} />
     {#key selectedMenu}
-    <div in:horizontalSlide={{ ...transitionProps }} class="col-span-2 sm:col-span-4 w-full h-full min-h-max gap-4 p-2 border shadow-lg rounded-xl {selectedMenu == 'product' ? 'flex flex-col' : 'hidden'}">
+    <div in:horizontalSlide={{ ...transitionProps }} class="col-span-4 md:col-span-7 xl:col-span-8 w-full h-full min-h-max gap-4 p-2 border shadow-lg rounded-xl {selectedMenu == 'product' ? 'flex flex-col' : 'hidden'}">
         {#if productsGroupedByCategory}
         <ProductCategoryList categories={productsGroupedByCategory} onCategorySelected={(cId) => { filteredProducts = filterCategory(cId, productsGroupedByCategory) }} />
         <div class="h-full w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 px-2 gap-4 max-h-[65svh] sm:max-h-[75svh] overflow-auto justify-self-start">
@@ -145,7 +145,7 @@
         {/if}
     </div>
     
-    <div in:horizontalSlide={{ ...transitionProps }} class="col-span-2 w-full h-full gap-4 justify-between p-2 border shadow-lg rounded-xl {selectedMenu == 'cart' ? 'flex flex-wrap flex-col' : 'hidden sm:flex flex-wrap flex-col'}">
+    <div in:horizontalSlide={{ ...transitionProps }} class="col-span-4 md:col-span-5 xl:col-span-4 w-full h-full gap-4 justify-between p-2 border shadow-lg rounded-xl {selectedMenu == 'cart' ? 'flex flex-col' : 'hidden md:flex flex-col'}">
 
         <div class=" flex flex-col gap-y-4">
             <div class="p-2 border rounded-xl shadow-md flex flex-col gap-y-2">
