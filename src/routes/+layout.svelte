@@ -4,7 +4,7 @@
 </script>
 
 <svelte:head>
-	<title>Angkringan</title>
+	<title>POS</title>
 </svelte:head>
-<Toaster closeButton />
+<Toaster closeButton position="top-center" richColors />
 <slot />

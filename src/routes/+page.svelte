@@ -5,7 +5,6 @@
 	import ProductCard from "$lib/components/ui/ProductCard.svelte";
 	import Navbar from "$lib/components/ui/Navbar.svelte";
 
-
     let showItemState: 'menu'|'toping' = 'menu'
     const hideShowScrollBar = (state: 'in'|'out' = 'in') => {
 		if(document) {
@@ -37,9 +36,13 @@
             label: 'Login'
         })
     }
-</script>
 
-<div class="p-4 flex flex-col gap-2 min-h-[100svh] w-full h-full bg-neutral-50">
+</script>
+<svelte:head>
+	<title>POS</title>
+</svelte:head>
+
+<div class="px-4 flex flex-col gap-2 min-h-[100svh] w-full h-full bg-neutral-50">
 
     <Navbar {menus} user={data.user} />
 

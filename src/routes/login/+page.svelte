@@ -15,9 +15,7 @@
           let isSuccess = form.success as boolean
           let toastMessage = isSuccess ? 'The Action Executed Successfully' : 'The Action Failed to Execute'
           if(form.message && typeof form.message === 'string') toastMessage = form.message
-          toast(isSuccess ? 'Success' : 'Failed', {
-              description: toastMessage,
-          })
+          isSuccess ? toast.success(toastMessage) : toast.error(toastMessage)
       }
   }
     
@@ -31,9 +29,7 @@
             processing = false
             await update()
             if(result.type == "redirect") {
-              toast('Success', {
-                description: 'Selamat Datang',
-              })
+              toast.success('Selamat Datang')
               return goto(result.location)
             }
         }
@@ -41,6 +37,9 @@
 
 
 </script>
+<svelte:head>
+	<title>POS</title>
+</svelte:head>
 <div class="w-full min-h-[100svh] flex bg-neutral-50 mx-auto items-center justify-center px-4">
     <div class="bg-white border border-gray-200 rounded-xl shadow-sm w-full max-w-sm p-4">
         <div class="p-4 sm:p-7">

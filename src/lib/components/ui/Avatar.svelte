@@ -5,6 +5,7 @@
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
 	import type { SubmitFunction } from "@sveltejs/kit";
 	import { onMount } from "svelte";
+	import { toast } from "svelte-sonner";
     
     export let user: App.Locals["user"]
     export let shouldHideOnMobile = false
@@ -20,7 +21,9 @@
         return async ( { result, update } ) => {
               await update()
               processing = false
-              applyAction(result)
+              if(result.type == "success" || result.type == "redirect") {
+                toast.info('Berhasil Logout')
+              }
           }
     }
 
