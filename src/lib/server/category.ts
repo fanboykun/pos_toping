@@ -1,7 +1,8 @@
-import { Prisma, PrismaClient } from "@prisma/client"
+import { Prisma } from "@prisma/client"
+import { prisma } from "$lib/server/db"
 
 
-const prisma = new PrismaClient()
+// const prisma = new PrismaClient()
 
 export const getAllCategory = async () => {
     try {
