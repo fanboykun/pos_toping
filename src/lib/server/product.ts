@@ -1,7 +1,6 @@
-import { PrismaClient } from '@prisma/client'
 import { Prisma } from '@prisma/client'
+import { prisma } from "$lib/server/db"
 
-const prisma = new PrismaClient()
 export type AllProductWithCategory = Prisma.PromiseReturnType<typeof getAllProductWithCategory>
 export type ProductWithCategory = Prisma.PromiseReturnType<typeof getProductWithCategory>
 export type ProductsGroupedByCategory = Prisma.PromiseReturnType<typeof getProductsGroupedByCategory>

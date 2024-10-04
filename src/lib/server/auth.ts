@@ -1,9 +1,10 @@
 import { Lucia } from "lucia";
 import { dev } from "$app/environment";
 import { PrismaAdapter } from "@lucia-auth/adapter-prisma";
-import { PrismaClient } from "@prisma/client";
+// import { PrismaClient } from "@prisma/client";
+import { prisma } from "$lib/server/db"
 
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient();
 const adapter = new PrismaAdapter(prisma.session, prisma.user);
 
 

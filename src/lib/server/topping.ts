@@ -1,7 +1,5 @@
-import { Prisma, PrismaClient } from "@prisma/client"
-
-
-const prisma = new PrismaClient()
+import { Prisma } from "@prisma/client"
+import { prisma } from "$lib/server/db"
 
 export const getAllTopping = async () => {
     try {
