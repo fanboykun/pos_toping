@@ -1,7 +1,6 @@
 import type { MakeTransaction } from '$lib/transaction'
-import { PrismaClient } from '@prisma/client'
 import { Prisma } from '@prisma/client'
-const prisma = new PrismaClient()
+import { prisma } from "$lib/server/db"
 
 export type TrasactionsWithProductWithToping = Prisma.PromiseReturnType<typeof getAllTransaction>
 export type TrasactionWithProductWithToping = Prisma.PromiseReturnType<typeof findTransactionWithProductAndToping>

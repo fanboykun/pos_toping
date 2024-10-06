@@ -3,9 +3,7 @@ import { getProductsGroupedByCategory } from '$lib/server/product.js'
 import { getAllTopping } from '$lib/server/topping.js'
 import { fail, redirect, type Action, type Actions } from '@sveltejs/kit';
 import type { MakeTransaction } from '$lib/transaction.js';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient()
+import { prisma } from "$lib/server/db"
 
 export const load = async ( { locals, params } ) => {
     if ( !locals.session || locals.user === null  ) {

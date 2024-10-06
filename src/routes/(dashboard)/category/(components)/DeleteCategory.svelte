@@ -5,6 +5,7 @@
 	import type { ActionData } from "../$types";
 	import { applyAction, enhance } from "$app/forms";
 	import { toast } from "svelte-sonner";
+	import { tick } from "svelte";
 
     export let categoryId: string|undefined
     export let isOpen = false
@@ -24,9 +25,10 @@
         formData.append('categoryId', categoryId)
         deleting = true
         return async ( { result, update } ) => {
+            await update()
+            await tick(); // Ensure UI reactivity
             deleting = false
             if(result.type == 'success') {
-                await update()
                 onClose()
             }
         }

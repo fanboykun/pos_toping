@@ -4,6 +4,7 @@
 	import type { SubmitFunction } from "@sveltejs/kit";
 	import type { ActionData } from "../$types";
 	import { applyAction, enhance } from "$app/forms";
+	import { tick } from "svelte";
 
     export let userId: string|undefined
     export let isOpen = false
@@ -24,9 +25,10 @@
         deleting = true
         return async ( { result, update } ) => {
             await update()
+            await tick(); // Ensure UI reactivity
             deleting = false
             if(result.type == 'success') {
-              onClose()
+                onClose()
             }
         }
     }

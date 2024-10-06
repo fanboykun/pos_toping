@@ -1,10 +1,9 @@
-import { PrismaClient } from '@prisma/client'
 import type { Actions } from '@sveltejs/kit'
 import { lucia } from "$lib/server/auth";
 import { fail, redirect } from "@sveltejs/kit";
+import { prisma } from "$lib/server/db"
 
 export const load = async () => {
-    const prisma = new PrismaClient()
     const products = await prisma.product.findMany({
         include: { category: true }
     })
@@ -15,7 +14,7 @@ export const load = async () => {
 export const actions: Actions = {
     logout: async (event) => {
         if (!event.locals.session) {
-            return fail(403, { message: 'Unauthenticated User' });
+            return fail(403, { message: 'Unauthenticated User', success: false });
         }
         await lucia.invalidateSession(event.locals.session.id);
         const sessionCookie = lucia.createBlankSessionCookie();

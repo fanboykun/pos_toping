@@ -5,11 +5,12 @@
   import { Label } from "$lib/components/ui/label";
   import * as Select from "$lib/components/ui/select/index";
 	import type { Category } from "@prisma/client";
-	import { capitalizeFirstLetterOfEachWord } from '$lib';
+	import { capitalizeFirstLetterOfEachWord, sleep } from '$lib';
 	import { applyAction, enhance } from "$app/forms";
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import type { ActionData } from "../$types";
 	import InputError from "$lib/components/ui/InputError.svelte";
+	import { tick } from "svelte";
 
   export let form: ActionData
   export let isOpen: boolean = false
@@ -24,16 +25,14 @@
   }
 
   let creating = false
-
   const handleAddProduct: SubmitFunction = ( { formData } ) => {
-          creating = true
-          return async ( { result, update } ) => {
-              await update()
-              creating = false
-              if(result.type == 'success') {
-                onClose()
-              }
-          }
+    creating = true
+    return async ( { result, update } ) => {
+      await update()
+      await tick(); // Ensure UI reactivity
+      creating = false
+      if(result.type == 'success') { onClose() }
+    }
   }
 
 

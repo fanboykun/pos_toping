@@ -41,7 +41,7 @@
         <DropdownMenu.Label>{capitalizeFirstLetterOfEachWord(user?.name ?? '')}</DropdownMenu.Label>
         <DropdownMenu.Separator />
         <DropdownMenu.Item class="flex">
-            <form action="/?/logout" method="post" use:enhance={handleLogout} class="w-full h-full bg-transparent">
+            <form action="/?/logout" method="post" use:enhance={handleLogout} class="w-full h-full bg-transparent flex gap-1 items-center">
                 <button type="submit" class="w-full h-full bg-transparent">Logout</button>
                 {#if processing}
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4 animate-spin">

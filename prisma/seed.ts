@@ -2,7 +2,9 @@ import { PrismaClient } from '@prisma/client'
 import { faker } from '@faker-js/faker';
 import { v4 as uuid } from 'uuid'
 import type { MakeTransaction, MakeTransactionProduct, MakeTransactionToping } from '../src/lib/transaction'
+// import { prisma } from '../src/lib/server/db'
 import { Argon2id } from 'oslo/password';
+
 const prisma = new PrismaClient()
 
 type DummyCategory = {
