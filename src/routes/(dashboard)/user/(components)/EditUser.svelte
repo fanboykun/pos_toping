@@ -8,6 +8,7 @@
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import type { ActionData } from "../$types";
 	import InputError from "$lib/components/ui/InputError.svelte";
+	import { tick } from "svelte";
 
   type UserWithoutPassword = Omit<User, 'password'>
   export let form: ActionData
@@ -29,11 +30,12 @@
       formData.append('id', user.id)
 
       return async ( { result, update } ) => {
+        await update()
+        await tick(); // Ensure UI reactivity
+        updating = false
         if(result.type == 'success') {
-          await update()
           onClose()
         }
-        updating = false
       }
   }
 

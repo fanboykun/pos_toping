@@ -7,6 +7,7 @@
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import type { ActionData } from "../$types";
 	import InputError from "$lib/components/ui/InputError.svelte";
+	import { tick } from "svelte";
 
   export let form: ActionData
   export let isOpen: boolean = false
@@ -23,11 +24,12 @@
   const handleAddCategory: SubmitFunction = ( { formData } ) => {
           creating = true
           return async ( { result, update } ) => {
+            await update()
+            await tick(); // Ensure UI reactivity
+            creating = false
             if(result.type == 'success') {
-              await update()
               onClose()
             } 
-            creating = false
           }
   }
 

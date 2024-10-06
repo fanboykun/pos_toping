@@ -4,7 +4,7 @@
     import * as Dialog from "$lib/components/ui/dialog"
 	import type { Product, Toping } from '@prisma/client';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import { applyAction, enhance } from '$app/forms';
+	import { enhance } from '$app/forms';
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import { beforeNavigate, goto } from '$app/navigation';
 	import { onMount } from 'svelte';
@@ -76,12 +76,14 @@
     const handleAddTransaction: SubmitFunction = ( { formData, cancel } ) => {
         processing = true
         formData.append('data', JSON.stringify($makeTransaction))
-        return async ( { result } ) => {
-            processing = false
-            if(result.type == "success") {
+        return async ( { result, update } ) => {
+            if(result.type == "success" || result.type == "redirect") {
+                processing = false
                 resetMakeTransaction()
-                // await update()
                 return goto('/order')
+            } else {
+                await update()
+                processing = false
             }
         }
     }
@@ -109,8 +111,6 @@
     const changeMenu = (menu: 'product'|'cart' = 'product') => {
         selectedMenu = menu
     }
-
-
 </script>
 {#await data.productsGroupedByCategory}
     <LoadingState />
