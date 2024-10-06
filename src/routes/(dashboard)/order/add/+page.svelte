@@ -4,7 +4,7 @@
     import * as Dialog from "$lib/components/ui/dialog"
 	import type { Product, Toping } from '@prisma/client';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import { applyAction, enhance } from '$app/forms';
+	import { enhance } from '$app/forms';
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import { beforeNavigate, goto } from '$app/navigation';
 	import { onMount } from 'svelte';
@@ -111,8 +111,6 @@
     const changeMenu = (menu: 'product'|'cart' = 'product') => {
         selectedMenu = menu
     }
-
-
 </script>
 {#await data.productsGroupedByCategory}
     <LoadingState />
