@@ -49,7 +49,7 @@ const login: Action = async ( { request, cookies } ) => {
        ...sessionCookie.attributes
     });
 
-    return redirect(302, '/dashboard')
+    return { 'user' : user.name }
 }
 
 export const actions: Actions = { login }

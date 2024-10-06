@@ -23,11 +23,11 @@
         formData.append('userId', userId)
         deleting = true
         return async ( { result, update } ) => {
-            await update()
-            deleting = false
             if(result.type == 'success') {
-              onClose()
+                await update()
+                onClose()
             }
+            deleting = false
         }
     }
 

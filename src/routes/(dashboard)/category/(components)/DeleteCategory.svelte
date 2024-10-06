@@ -24,11 +24,11 @@
         formData.append('categoryId', categoryId)
         deleting = true
         return async ( { result, update } ) => {
-            deleting = false
             if(result.type == 'success') {
                 await update()
                 onClose()
             }
+            deleting = false
         }
     }
 

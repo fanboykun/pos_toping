@@ -23,11 +23,11 @@
   const handleAddCategory: SubmitFunction = ( { formData } ) => {
           creating = true
           return async ( { result, update } ) => {
-            creating = false
             if(result.type == 'success') {
-                await update()
-                onClose()
-              } 
+              await update()
+              onClose()
+            } 
+            creating = false
           }
   }
 

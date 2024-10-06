@@ -76,11 +76,11 @@
     const handleAddTransaction: SubmitFunction = ( { formData, cancel } ) => {
         processing = true
         formData.append('data', JSON.stringify($makeTransaction))
-        return async ( { result, update } ) => {
+        return async ( { result } ) => {
             processing = false
             if(result.type == "success") {
                 resetMakeTransaction()
-                await update()
+                // await update()
                 return goto('/order')
             }
         }
