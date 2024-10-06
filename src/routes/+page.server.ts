@@ -14,7 +14,7 @@ export const load = async () => {
 export const actions: Actions = {
     logout: async (event) => {
         if (!event.locals.session) {
-            return fail(403, { message: 'Unauthenticated User' });
+            return fail(403, { message: 'Unauthenticated User', success: false });
         }
         await lucia.invalidateSession(event.locals.session.id);
         const sessionCookie = lucia.createBlankSessionCookie();

@@ -24,11 +24,14 @@
     let processing = false
     const handleLogin: SubmitFunction = ( { formData } ) => {
         processing = true
-        return async ( { result } ) => {
-          if(result.type == "success") {
-            toast.success(`Selamat Datang ${result.data?.user}`)
+        return async ( { result, update } ) => {
+          if(result.type == "success" || result.type == "redirect") {
+            result.type == "success" ? toast.success(`Selamat Datang ${result.data?.user}`) : console.log('success')
             processing = false
             return goto('/dashboard')
+          } else {
+            await update()
+            processing = false
           }
         }
     }

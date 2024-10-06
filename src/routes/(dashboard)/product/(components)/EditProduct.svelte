@@ -11,6 +11,7 @@
 	import type { ActionData } from "../$types";
 	import InputError from "$lib/components/ui/InputError.svelte";
 	import type { ProductWithCategory } from "$lib/server/product";
+	import { tick } from "svelte";
 
   export let form: ActionData
   export let isOpen: boolean = false
@@ -39,11 +40,12 @@
       formData.append('id', product.id)
 
       return async ( { result, update } ) => {
+        await update()
+        await tick(); // Ensure UI reactivity
+        editing = false
         if(result.type == 'success') {
-          await update()
           onClose()
         }
-        editing = false
       }
   }
 
