@@ -82,11 +82,11 @@
         if(!data.transaction) return cancel()
         formData.append('data', JSON.stringify($makeTransaction))
         formData.append('transactionId', data.transaction.id)
-        return async ( { result, update } ) => {
+        return async ( { result } ) => {
             processing = false
             if(result.type == "success") {
                 resetMakeTransaction()
-                await update()
+                // await update()
                 return goto('/order')
             }
         }

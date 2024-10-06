@@ -1,7 +1,6 @@
 <script lang="ts">
-	import { applyAction, enhance } from "$app/forms";
+	import { enhance } from "$app/forms";
 	import { goto } from "$app/navigation";
-	import Button from "$lib/components/ui/button/button.svelte";
 	import Input from "$lib/components/ui/input/input.svelte";
 	import InputError from "$lib/components/ui/InputError.svelte";
 	import Label from "$lib/components/ui/label/label.svelte";
@@ -25,13 +24,12 @@
     let processing = false
     const handleLogin: SubmitFunction = ( { formData } ) => {
         processing = true
-        return async ( { result, update } ) => {
+        return async ( { result } ) => {
+          if(result.type == "success") {
+            toast.success(`Selamat Datang ${result.data?.user}`)
             processing = false
-            await update()
-            if(result.type == "redirect") {
-              toast.success('Selamat Datang')
-              return goto(result.location)
-            }
+            return goto('/dashboard')
+          }
         }
     }
 

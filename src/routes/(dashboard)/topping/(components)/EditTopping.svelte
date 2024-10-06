@@ -28,11 +28,11 @@
       formData.append('id', topping.id)
 
       return async ( { result, update } ) => {
-          await update()
-          updating = false
-          if(result.type == 'success') {
+        if(result.type == 'success') {
+            await update()
             onClose()
           }
+          updating = false
       }
   }
 

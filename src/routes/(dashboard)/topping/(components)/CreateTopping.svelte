@@ -23,11 +23,11 @@
   const handleAddTopping: SubmitFunction = ( { formData } ) => {
           creating = true
           return async ( { result, update } ) => {
+            if(result.type == 'success') {
               await update()
-              creating = false
-              if(result.type == 'success') {
-                onClose()
-              }
+              onClose()
+            }
+            creating = false
           }
   }
 

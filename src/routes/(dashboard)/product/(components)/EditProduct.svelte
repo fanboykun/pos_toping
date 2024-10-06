@@ -39,11 +39,11 @@
       formData.append('id', product.id)
 
       return async ( { result, update } ) => {
+        if(result.type == 'success') {
           await update()
-          editing = false
-          if(result.type == 'success') {
-            onClose()
-          }
+          onClose()
+        }
+        editing = false
       }
   }
 

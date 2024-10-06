@@ -11,14 +11,18 @@ const E = {
 } as const
 
 const getPrismaInstance = () => {
-  // if(MODE === "development") return new PrismaClient()
+  if(MODE === "production") {
+    const libsql = createClient({
+      url: TURSO_DATABASE_URL,
+      authToken: TURSO_AUTH_TOKEN,
+    })
+    const adapter = new PrismaLibSQL(libsql)
+    return new PrismaClient({ adapter })
+  }
+  else {
+    return new PrismaClient()
+  }
 
-  const libsql = createClient({
-    url: TURSO_DATABASE_URL,
-    authToken: TURSO_AUTH_TOKEN,
-  })
-  const adapter = new PrismaLibSQL(libsql)
-  return new PrismaClient({ adapter })
 
 }
 export const prisma = getPrismaInstance()
