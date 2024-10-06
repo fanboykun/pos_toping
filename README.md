@@ -1,10 +1,6 @@
 ## Requirement
     - SQLite
     - Nodejs
-
-## Serverless Requirement
-    - Turso as Serveless SQLite Database
-    - Vercel as Serverless
   
 ## Configuration
 > First, make sure you already make or have the database for this project
