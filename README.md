@@ -4,7 +4,7 @@
 
 ## Serverless Requirement
     - Turso as Serveless SQLite Database
-    - Vercel as Serverless
+    - Vercel as Serverless Function
   
 ## Configuration
 > First, make sure you already make or have the database for this project
